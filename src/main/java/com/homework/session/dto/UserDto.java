@@ -1,18 +1,26 @@
 package com.homework.session.dto;
 
 import com.homework.session.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
+
     private String email;
     private String password;
     private String phoneNumber;
 
     @Builder
-    public UserDto(String email, String password, String phoneNumber) {
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
+    public static UserDto dtoSet(User user) {
+        return UserDto.builder()
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
     }
 
     public User toEntity(){

@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.hibernate.internal.CoreLogging.logger;
-
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -24,13 +22,13 @@ public class LoginService {
     }
 
     @Transactional
-    public void signup(UserDto userDto) {
+    public UserDto signup(UserDto userDto) {
         User user = userDto.toEntity();
 
         if (checkEmailDuplicate(user.getEmail())) {
-            logger("이미 등록된 이메일이 있습니다.");
+            throw new RuntimeException("이미 등록된 이메일이 있습니다.");
         } else {
-            userRepository.save(user);
+            return UserDto.dtoSet(userRepository.save(user));
         }
     }
 
@@ -40,13 +38,24 @@ public class LoginService {
     }
 
     @Transactional
-    public Long update(Long id, UserDto userDto) {
-        User user = userRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("등록된 이메일이 없습니다."));
+    public UserDto update(String email, UserDto userDto) {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new IllegalArgumentException("등록된 이메일이 없습니다."));
+
         user.builder()
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .phoneNumber(user.getPhoneNumber())
                 .build();
-        return id;
+
+        return UserDto.dtoSet(userRepository.save(user));
+    }
+
+    @Transactional
+    public UserDto delete(String email, UserDto userDto) {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new IllegalArgumentException("등록된 이메일이 없습니다."));
+
+        return UserDto.dtoSet(userRepository.deleteByEmail(email));
     }
 }
