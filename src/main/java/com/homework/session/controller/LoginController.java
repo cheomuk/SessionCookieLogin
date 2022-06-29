@@ -47,16 +47,16 @@ public class LoginController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserDto> signUp(@Valid @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(loginService.signup(userDto));
+        return loginService.signup(userDto);
     }
 
     @PutMapping("/update/{email}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable String email, @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(loginService.update(email, userDto));
+    public ResponseEntity<UserDto> updateUser(@Valid @PathVariable String email, @RequestBody UserDto userDto) {
+        return loginService.update(email, userDto);
     }
 
-    @DeleteMapping("/delete/{email}")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable String email, @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(loginService.delete(email, userDto));
+    @DeleteMapping("/{email}")
+    public ResponseEntity<String> deleteUser(@PathVariable String email) {
+        return loginService.delete(email);
     }
 }
