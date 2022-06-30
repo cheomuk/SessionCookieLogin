@@ -40,8 +40,8 @@ public class LoginController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
-        sessionManager.expire(request);
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        sessionManager.expire(request, response);
         return new ResponseEntity<>("로그아웃 되었습니다.", HttpStatus.OK);
     }
 
