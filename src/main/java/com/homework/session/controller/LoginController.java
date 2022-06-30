@@ -6,6 +6,7 @@ import com.homework.session.service.LoginService;
 import com.homework.session.sessionManager.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -18,31 +19,30 @@ import javax.validation.Valid;
 @Slf4j
 @RequiredArgsConstructor
 public class LoginController {
-
     private final SessionManager sessionManager;
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public String login(@Valid @ModelAttribute User user, BindingResult bindingResult,
+    public ResponseEntity<String> login(@Valid @RequestBody UserDto userDto, BindingResult bindingResult,
                       HttpServletResponse response) {
         if (bindingResult.hasErrors()){
-            return "redirect:/";
+            return new ResponseEntity<>("로그인에 실패했습니다.", HttpStatus.BAD_REQUEST);
         }
 
-        User loginUser = loginService.login(user.getEmail(), user.getPassword());
+        User loginUser = loginService.login(userDto.getEmail(), userDto.getPassword());
 
         if (loginUser == null){
             bindingResult.reject("loginFail", "아이디 또는 비번이 일치하지 않습니다.");
         }
 
         sessionManager.createSession(loginUser, response);
-        return "/loginHome";
+        return new ResponseEntity<>("로그인에 성공했습니다.", HttpStatus.OK);
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         sessionManager.expire(request);
-        return "redirect:/";
+        return new ResponseEntity<>("로그아웃 되었습니다.", HttpStatus.OK);
     }
 
     @PostMapping("/signup")
@@ -50,13 +50,13 @@ public class LoginController {
         return loginService.signup(userDto);
     }
 
-    @PutMapping("/update/{email}")
-    public ResponseEntity<UserDto> updateUser(@Valid @PathVariable String email, @RequestBody UserDto userDto) {
-        return loginService.update(email, userDto);
+    @PutMapping("/update")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto) {
+        return loginService.update(userDto);
     }
 
-    @DeleteMapping("/{email}")
-    public ResponseEntity<String> deleteUser(@PathVariable String email) {
-        return loginService.delete(email);
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(@RequestBody UserDto userDto) {
+        return loginService.delete(userDto);
     }
 }

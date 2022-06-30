@@ -55,21 +55,13 @@ public class LoginService {
     }
 
     @Transactional
-    public ResponseEntity<UserDto> update(String email, UserDto userDto) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            throw new RuntimeException("User Not Found");
-        }
+    public ResponseEntity<UserDto> update(UserDto userDto) {
 
-        User user = userOpt.get();
+        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
+                    { throw new RuntimeException("해당 이메일을 찾을 수 없습니다."); });
 
-        user.builder()
-                .email(userDto.getEmail())
-                .password(userDto.getPassword())
-                .phoneNumber(userDto.getPhoneNumber())
-                .build();
+        user.update(userDto);
 
-        userRepository.save(user);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
@@ -77,13 +69,13 @@ public class LoginService {
     }
 
     @Transactional
-    public ResponseEntity<String> delete(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
+    public ResponseEntity<String> delete(UserDto userDto) {
+        Optional<User> user = userRepository.findByEmail(userDto.getEmail());
         if (user.isPresent()) {
             userRepository.delete(user.get());
         } else {
             throw new RuntimeException("회원이 아닙니다.");
         }
-        return new ResponseEntity<>(email + " 가 정상적으로 탈퇴 처리 되었습니다.", HttpStatus.OK);
+        return new ResponseEntity<>(userDto.getEmail() + " 가 정상적으로 탈퇴 처리 되었습니다.", HttpStatus.OK);
     }
 }

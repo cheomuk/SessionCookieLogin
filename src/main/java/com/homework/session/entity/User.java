@@ -1,5 +1,6 @@
 package com.homework.session.entity;
 
+import com.homework.session.dto.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,5 +33,11 @@ public class User {
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
+    }
+
+    public void update(UserDto userDto) {
+        this.email = userDto.getEmail();
+        this.password = userDto.getPassword();
+        this.phoneNumber = userDto.getPhoneNumber();
     }
 }
