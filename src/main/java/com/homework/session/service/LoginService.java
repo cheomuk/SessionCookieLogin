@@ -24,15 +24,15 @@ public class LoginService {
     private final UserRepository userRepository;
 
     @Transactional
-    public User login(String email, String password) {
-        return userRepository.findByEmail(email)
+    public void login(String email, String password) {
+        userRepository.findByEmail(email)
                 .filter(u -> u.getPassword().equals(password))
-                .orElse(null);
+                .orElseThrow(() -> { throw new RuntimeException("회원정보가 맞지 않습니다. 다시 시도해주세요."); });
     }
 
     @Transactional
     public ResponseEntity<UserDto> signup(UserDto userDto) {
-        if (checkEmailDuplicate(userDto.getEmail())) {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new RuntimeException("이미 등록된 이메일이 있습니다.");
         }
 
@@ -47,11 +47,6 @@ public class LoginService {
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         return new ResponseEntity<>(userDto, httpHeaders, HttpStatus.CREATED);
-    }
-
-    @Transactional
-    public boolean checkEmailDuplicate(String email) {
-        return userRepository.existsByEmail(email);
     }
 
     @Transactional

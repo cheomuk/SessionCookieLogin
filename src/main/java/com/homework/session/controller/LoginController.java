@@ -1,7 +1,6 @@
 package com.homework.session.controller;
 
 import com.homework.session.dto.UserDto;
-import com.homework.session.entity.User;
 import com.homework.session.service.LoginService;
 import com.homework.session.sessionManager.SessionManager;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +28,14 @@ public class LoginController {
             return new ResponseEntity<>("로그인에 실패했습니다.", HttpStatus.BAD_REQUEST);
         }
 
-        User loginUser = loginService.login(userDto.getEmail(), userDto.getPassword());
+        loginService.login(userDto.getEmail(), userDto.getPassword());
 
-        if (loginUser == null){
-            bindingResult.reject("loginFail", "아이디 또는 비번이 일치하지 않습니다.");
-        }
+        UserDto saveDto = UserDto.builder()
+                .email(userDto.getEmail())
+                .password(userDto.getPassword())
+                .build();
 
-        sessionManager.createSession(loginUser, response);
+        sessionManager.createSession(saveDto, response);
         return new ResponseEntity<>("로그인에 성공했습니다.", HttpStatus.OK);
     }
 
