@@ -3,6 +3,8 @@ package com.homework.session.service;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.UserDto;
 import com.homework.session.entity.User;
+import com.homework.session.error.exception.NotFoundException;
+import com.homework.session.error.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+
+import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
 @RequiredArgsConstructor
 @Transactional
@@ -27,13 +31,13 @@ public class LoginService {
     public void login(String email, String password) {
         userRepository.findByEmail(email)
                 .filter(u -> u.getPassword().equals(password))
-                .orElseThrow(() -> { throw new RuntimeException("회원정보가 맞지 않습니다. 다시 시도해주세요."); });
+                .orElseThrow(() -> new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION) );
     }
 
     @Transactional
     public ResponseEntity<UserDto> signup(UserDto userDto) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new RuntimeException("이미 등록된 이메일이 있습니다.");
+            throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
         User user = User.builder()
@@ -53,7 +57,7 @@ public class LoginService {
     public ResponseEntity<UserDto> update(UserDto userDto) {
 
         User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
-                    { throw new RuntimeException("해당 이메일을 찾을 수 없습니다."); });
+                    { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         user.update(userDto);
 
@@ -69,7 +73,7 @@ public class LoginService {
         if (user.isPresent()) {
             userRepository.delete(user.get());
         } else {
-            throw new RuntimeException("회원이 아닙니다.");
+            throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
         return new ResponseEntity<>(userDto.getEmail() + " 가 정상적으로 탈퇴 처리 되었습니다.", HttpStatus.OK);
     }

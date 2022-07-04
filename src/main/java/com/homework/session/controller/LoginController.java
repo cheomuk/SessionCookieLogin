@@ -1,6 +1,7 @@
 package com.homework.session.controller;
 
 import com.homework.session.dto.UserDto;
+import com.homework.session.error.exception.BadRequestException;
 import com.homework.session.service.LoginService;
 import com.homework.session.sessionManager.SessionManager;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import static com.homework.session.error.ErrorCode.RUNTIME_EXCEPTION;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -25,7 +28,7 @@ public class LoginController {
     public ResponseEntity<String> login(@Valid @RequestBody UserDto userDto, BindingResult bindingResult,
                       HttpServletResponse response) {
         if (bindingResult.hasErrors()){
-            return new ResponseEntity<>("로그인에 실패했습니다.", HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("E0001", RUNTIME_EXCEPTION);
         }
 
         loginService.login(userDto.getEmail(), userDto.getPassword());
