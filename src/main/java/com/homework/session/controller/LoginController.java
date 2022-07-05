@@ -6,8 +6,6 @@ import com.homework.session.service.LoginService;
 import com.homework.session.sessionManager.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +23,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserDto userDto, BindingResult bindingResult,
+    public void login(@Valid @RequestBody UserDto userDto, BindingResult bindingResult,
                       HttpServletResponse response) {
         if (bindingResult.hasErrors()){
             throw new BadRequestException("E0001", RUNTIME_EXCEPTION);
@@ -39,27 +37,28 @@ public class LoginController {
                 .build();
 
         sessionManager.createSession(saveDto, response);
-        return new ResponseEntity<>("로그인에 성공했습니다.", HttpStatus.OK);
+        log.info("login success");
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
         sessionManager.expire(request, response);
-        return new ResponseEntity<>("로그아웃 되었습니다.", HttpStatus.OK);
+        log.info("logout success");
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDto> signUp(@Valid @RequestBody UserDto userDto) {
+    public UserDto signUp(@Valid @RequestBody UserDto userDto) {
         return loginService.signup(userDto);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto) {
+    public UserDto updateUser(@RequestBody UserDto userDto) {
         return loginService.update(userDto);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(@RequestBody UserDto userDto) {
+    public UserDto deleteUser(@RequestBody UserDto userDto) {
+        log.info("delete success");
         return loginService.delete(userDto);
     }
 }
