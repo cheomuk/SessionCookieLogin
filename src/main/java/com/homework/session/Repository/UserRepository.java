@@ -1,5 +1,6 @@
 package com.homework.session.Repository;
 
+import com.homework.session.dto.UserDto;
 import com.homework.session.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

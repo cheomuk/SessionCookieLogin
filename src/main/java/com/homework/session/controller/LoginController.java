@@ -6,6 +6,8 @@ import com.homework.session.service.LoginService;
 import com.homework.session.sessionManager.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,9 @@ public class LoginController {
     private final SessionManager sessionManager;
     private final LoginService loginService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/login")
     public void login(@Valid @RequestBody UserDto userDto, BindingResult bindingResult,
                       HttpServletResponse response) {
@@ -33,32 +38,29 @@ public class LoginController {
 
         UserDto saveDto = UserDto.builder()
                 .email(userDto.getEmail())
-                .password(userDto.getPassword())
+                .password(passwordEncoder.encode(userDto.getPassword()))
                 .build();
 
         sessionManager.createSession(saveDto, response);
-        log.info("login success");
     }
 
     @GetMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         sessionManager.expire(request, response);
-        log.info("logout success");
     }
 
     @PostMapping("/signup")
-    public UserDto signUp(@Valid @RequestBody UserDto userDto) {
-        return loginService.signup(userDto);
+    public void signUp(@Valid @RequestBody UserDto userDto) {
+        loginService.signup(userDto);
     }
 
     @PutMapping("/update")
-    public UserDto updateUser(@RequestBody UserDto userDto) {
-        return loginService.update(userDto);
+    public void updateUser(@RequestBody UserDto userDto) {
+        loginService.update(userDto);
     }
 
     @DeleteMapping("/delete")
-    public UserDto deleteUser(@RequestBody UserDto userDto) {
-        log.info("delete success");
-        return loginService.delete(userDto);
+    public void deleteUser(@RequestBody UserDto userDto) {
+        loginService.delete(userDto);
     }
 }

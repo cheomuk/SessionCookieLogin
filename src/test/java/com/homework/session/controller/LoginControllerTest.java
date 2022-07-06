@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.UserDto;
 import com.homework.session.entity.User;
+import com.homework.session.error.exception.UnauthorizedException;
 import com.homework.session.service.LoginService;
 import com.homework.session.sessionManager.SessionManager;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,7 +60,7 @@ public class LoginControllerTest {
 
         User user = userRepository.findByEmail(userDto.getEmail())
                 .filter(u -> u.getPassword().equals(userDto.getPassword()))
-                .orElse(null);
+                .orElseThrow(() -> new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION) );
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         sessionManager.createSession(userDto, response);
@@ -100,7 +102,7 @@ public class LoginControllerTest {
         UserDto userDto = UserDto();
 
         User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
-                        { throw new RuntimeException("해당 이메일을 찾을 수 없습니다."); });
+                        { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         user.update(userDto);
 
