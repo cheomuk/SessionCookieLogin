@@ -7,8 +7,6 @@ import com.homework.session.error.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,17 +54,21 @@ public class LoginService {
         User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
                     { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        user.update(userDto);
+        UserDto updateDto = UserDto.builder()
+                .email(userDto.getEmail())
+                .password(passwordEncoder.encode(userDto.getPassword()))
+                .phoneNumber(userDto.getPhoneNumber())
+                .build();
+
+        user.update(updateDto);
     }
 
     @Transactional
     public void delete(UserDto userDto) {
-        Optional<User> user = userRepository.findByEmail(userDto.getEmail());
-        if (!user.isPresent()) {
-            throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
-        }
+        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
+            { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         log.info("탈퇴처리 되었습니다.");
-        userRepository.delete(user.get());
+        userRepository.delete(user);
     }
 }
