@@ -7,17 +7,27 @@ import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnauthorizedException;
 import com.homework.session.service.LoginService;
 import com.homework.session.sessionManager.SessionManager;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import java.util.HashMap;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -46,34 +56,33 @@ public class LoginControllerTest {
     @Autowired
     private SessionManager sessionManager;
 
-    public UserDto UserDto() {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public UserDto UserDtoTest() {
         return UserDto.builder()
-                .email("email1@email.com")
-                .password("password")
-                .phoneNumber("01012345675")
+                .email("gmail@email.com")
+                .password(passwordEncoder.encode("1234"))
+                .phoneNumber("01012345678")
                 .build();
     }
 
     @Test
     public void login_Test() throws Exception {
-        UserDto userDto = UserDto();
-
-        User user = userRepository.findByEmail(userDto.getEmail())
-                .filter(u -> u.getPassword().equals(userDto.getPassword()))
-                .orElseThrow(() -> new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION) );
-
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        sessionManager.createSession(userDto, response);
+        UserDto userDto = UserDto.builder()
+                            .email("gmail@email.com")
+                            .password("1234")
+                            .build();
 
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(userDto)))
                         .andExpect(status().isOk());
     }
 
     @Test
     public void logout_Test() throws Exception {
-        UserDto userDto = UserDto();
+        UserDto userDto = UserDtoTest();
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         sessionManager.createSession(userDto, response);
@@ -81,30 +90,24 @@ public class LoginControllerTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(response.getCookies());
 
-        sessionManager.expire(request, response);
+        sessionManager.expire(request);
         Object expiredSession = sessionManager.getSession(request);
         assertThat(expiredSession).isNull();
     }
 
     @Test
     public void signUp_Test() throws Exception {
-        UserDto userDto = UserDto();
+        UserDto userDto = UserDtoTest();
 
-        mockMvc.perform(post("/signup")
+        mockMvc.perform(MockMvcRequestBuilders.post("/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
-                        .andExpect(status().isCreated());
-
+                        .andExpect(status().isOk());
     }
 
     @Test
     public void update_Test() throws Exception {
-        UserDto userDto = UserDto();
-
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
-                        { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
-
-        user.update(userDto);
+        UserDto userDto = UserDtoTest();
 
         mockMvc.perform(put("/update")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,21 +117,13 @@ public class LoginControllerTest {
 
     @Test
     public void delete_Test() throws Exception {
-        UserDto userDto = UserDto();
-
-        User user = User.builder()
-                .email(userDto.getEmail())
-                .password(userDto.getPassword())
-                .phoneNumber(userDto.getPhoneNumber())
-                .build();
-
-        userRepository.save(user);
+        UserDto userDto = UserDtoTest();
 
         mockMvc.perform(delete("/delete")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(userDto)))
                         .andExpect(status().isOk());
 
-        assertThat(userRepository.findByEmail("email1@email.com").isEmpty());
+        assertThat(userRepository.findByEmail(UserDtoTest().getEmail()).isEmpty());
     }
 }
