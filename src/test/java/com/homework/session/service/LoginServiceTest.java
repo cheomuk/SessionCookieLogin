@@ -3,8 +3,7 @@ package com.homework.session.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.UserDto;
-import com.homework.session.entity.User;
-import com.homework.session.error.exception.UnauthorizedException;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertNotEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -41,7 +41,7 @@ public class LoginServiceTest {
     public UserDto UserDtoTest() {
         return UserDto.builder()
                 .email("testemail1@email.com")
-                .password("1234")
+                .password(passwordEncoder.encode("1234"))
                 .phoneNumber("01012345679")
                 .build();
     }
@@ -50,49 +50,59 @@ public class LoginServiceTest {
     public void serviceLogin_Test() throws Exception {
         UserDto userDto = UserDtoTest();
 
-        loginService.login(userDto.getEmail(), userDto.getPassword());
+        UserDto testDto = UserDto.builder()
+                                .email("testemail1@email.com")
+                                .password("1234")
+                                .build();
+
+        assertThat(userDto.getEmail().equals(testDto.getEmail()));
+        assertThat(passwordEncoder.matches(userDto.getPassword(), testDto.getPassword()));
+
+        loginService.login(testDto.getEmail(), testDto.getPassword());
     }
 
     @Test
-    public void serviceSignup_Test() throws Exception {
+    public void serviceSignUp_Test() throws Exception {
         UserDto userDto = UserDtoTest();
 
-        if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
-        }
-
-        User user = User.builder()
-                .email(userDto.getEmail())
-                .password(passwordEncoder.encode(userDto.getPassword()))
-                .phoneNumber(userDto.getPhoneNumber())
+        UserDto testDto = UserDto.builder()
+                .email("testemail6@email.com")
+                .password("1234")
+                .phoneNumber("01099998888")
                 .build();
 
-        userRepository.save(user);
+        assertNotEquals(userDto.getEmail(), testDto.getEmail());
+        loginService.signUp(testDto);
     }
 
     @Test
     public void serviceUpdate_Test() throws Exception {
         UserDto userDto = UserDtoTest();
 
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
-            { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
-
-        UserDto updateDto = UserDto.builder()
-                .email(userDto.getEmail())
-                .password(passwordEncoder.encode(userDto.getPassword()))
-                .phoneNumber(userDto.getPhoneNumber())
+        UserDto testDto = UserDto.builder()
+                .email("testemail1@email.com")
+                .password("1234")
+                .phoneNumber("01012344321")
                 .build();
 
-        user.update(updateDto);
+        assertThat(userDto.getEmail()).isEqualTo(testDto.getEmail());
+        loginService.update(testDto);
     }
 
     @Test
     public void serviceDelete_Test() throws Exception {
         UserDto userDto = UserDtoTest();
 
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
-            { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+        UserDto testDto = UserDto.builder()
+                .email("testemail1@email.com")
+                .build();
 
-        userRepository.delete(user);
+        assertThat(userDto.getEmail()).isEqualTo(testDto.getEmail());
+        loginService.delete(testDto);
+    }
+
+    @After
+    public void TestEnd() {
+        userRepository.deleteAll();
     }
 }

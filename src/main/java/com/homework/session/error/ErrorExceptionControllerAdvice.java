@@ -3,7 +3,7 @@ package com.homework.session.error;
 import com.homework.session.error.exception.BadRequestException;
 import com.homework.session.error.exception.InternerServerException;
 import com.homework.session.error.exception.NotFoundException;
-import com.homework.session.error.exception.UnauthorizedException;
+import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +27,8 @@ public class ErrorExceptionControllerAdvice {
                         .build());
     }
 
-    @ExceptionHandler({UnauthorizedException.class})
-    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final UnauthorizedException e) {
+    @ExceptionHandler({UnAuthorizedException.class})
+    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final UnAuthorizedException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()

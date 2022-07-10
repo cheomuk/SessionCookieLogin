@@ -54,7 +54,7 @@ public class LoginController {
 
     @PostMapping("/signup")
     public void signUp(@Valid @RequestBody UserDto userDto) {
-        loginService.signup(userDto);
+        loginService.signUp(userDto);
     }
 
     @PutMapping("/update")
