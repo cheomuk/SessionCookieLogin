@@ -3,15 +3,13 @@ package com.homework.session.service;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.UserDto;
 import com.homework.session.entity.User;
-import com.homework.session.error.exception.UnauthorizedException;
+import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
@@ -34,9 +32,9 @@ public class LoginService {
     }
 
     @Transactional
-    public void signup(UserDto userDto) {
+    public void signUp(UserDto userDto) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
         User user = User.builder()
@@ -52,7 +50,7 @@ public class LoginService {
     public void update(UserDto userDto) {
 
         User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
-                    { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+                    { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         UserDto updateDto = UserDto.builder()
                 .email(userDto.getEmail())
@@ -66,7 +64,7 @@ public class LoginService {
     @Transactional
     public void delete(UserDto userDto) {
         User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
-            { throw new UnauthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+            { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         log.info("탈퇴처리 되었습니다.");
         userRepository.delete(user);
