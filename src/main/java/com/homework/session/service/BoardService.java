@@ -20,8 +20,22 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public void getBoardList() {
+    public void getBoardList(BoardListDto boardListDto) {
+        BoardList boardList = BoardList.builder()
+                .nickname(boardListDto.getNickname())
+                .title(boardListDto.getTitle())
+                .build();
 
+        if (boardListDto.getNickname() != null) {
+            boardRepository.findByNickname(boardListDto.getNickname());
+        } else if (boardListDto.getTitle() != null) {
+            boardRepository.findByTitle(boardListDto.getTitle());
+        }
+    }
+
+    @Transactional
+    public void getAllBoardList() {
+        boardRepository.findAll();
     }
 
     @Transactional

@@ -1,6 +1,5 @@
 package com.homework.session.controller;
 
-import com.homework.session.Repository.BoardRepository;
 import com.homework.session.dto.BoardListDto;
 import com.homework.session.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -12,31 +11,30 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class BoardController {
 
-    private final BoardRepository boardRepository;
     private final BoardService boardService;
 
     @GetMapping("/")
     public void getAllBoardList() {
-        boardRepository.findAll();
+        boardService.getAllBoardList();
     }
 
     @GetMapping("/filter")
-    public void getBoardList() {
-
+    public void getBoardList(@RequestBody BoardListDto boardListDto) {
+        boardService.getBoardList(boardListDto);
     }
 
     @PostMapping("/list/create")
-    public void createBoard(BoardListDto boardListDto) {
+    public void createBoard(@RequestBody BoardListDto boardListDto) {
         boardService.createBoard(boardListDto);
     }
 
     @PutMapping("/list/update")
-    public void updateBoard(BoardListDto boardListDto) {
+    public void updateBoard(@RequestBody BoardListDto boardListDto) {
         boardService.updateBoard(boardListDto);
     }
 
     @DeleteMapping("/list/delete")
-    public void deleteBoard(BoardListDto boardListDto) {
+    public void deleteBoard(@RequestBody BoardListDto boardListDto) {
         boardService.deleteBoard(boardListDto);
     }
 }

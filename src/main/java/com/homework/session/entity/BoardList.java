@@ -27,9 +27,10 @@ public class BoardList extends BaseTimeEntity {
     private String title;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private BoardEnumCustom questEnum;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false)
     private String context;
 
     @Column
