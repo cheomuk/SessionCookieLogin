@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,6 +43,7 @@ public class LoginServiceTest {
     public UserDto UserDtoTest() {
         return UserDto.builder()
                 .email("testemail1@email.com")
+                .nickName("테스트 유저2")
                 .password(passwordEncoder.encode("1234"))
                 .phoneNumber("01012345679")
                 .build();
@@ -51,14 +54,17 @@ public class LoginServiceTest {
         UserDto userDto = UserDtoTest();
 
         UserDto testDto = UserDto.builder()
-                                .email("testemail1@email.com")
-                                .password("1234")
-                                .build();
+                .email("testemail1@email.com")
+                .nickName("테스트 유저2")
+                .password("1234")
+                .build();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         assertThat(userDto.getEmail().equals(testDto.getEmail()));
         assertThat(passwordEncoder.matches(userDto.getPassword(), testDto.getPassword()));
 
-        loginService.login(testDto.getEmail(), testDto.getPassword());
+        loginService.login(testDto.getEmail(), testDto.getPassword(), response);
     }
 
     @Test
@@ -67,6 +73,7 @@ public class LoginServiceTest {
 
         UserDto testDto = UserDto.builder()
                 .email("testemail6@email.com")
+                .nickName("테스트 유저2")
                 .password("1234")
                 .phoneNumber("01099998888")
                 .build();
@@ -81,12 +88,15 @@ public class LoginServiceTest {
 
         UserDto testDto = UserDto.builder()
                 .email("testemail1@email.com")
+                .nickName("테스트 유저2")
                 .password("1234")
                 .phoneNumber("01012344321")
                 .build();
 
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
         assertThat(userDto.getEmail()).isEqualTo(testDto.getEmail());
-        loginService.update(testDto);
+        loginService.update(testDto, request);
     }
 
     @Test
@@ -97,8 +107,10 @@ public class LoginServiceTest {
                 .email("testemail1@email.com")
                 .build();
 
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
         assertThat(userDto.getEmail()).isEqualTo(testDto.getEmail());
-        loginService.delete(testDto);
+        loginService.delete(testDto, request);
     }
 
     @After

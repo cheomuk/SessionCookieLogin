@@ -22,21 +22,26 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    private String nickName;
+
+    @Column(nullable = false, length = 60)
     private String password;
 
     @Column
     private String phoneNumber;
 
     @Builder
-    public User(String email, String password, String phoneNumber) {
+    public User(String email, String nickName, String password, String phoneNumber) {
         this.email = email;
+        this.nickName = nickName;
         this.password = password;
         this.phoneNumber = phoneNumber;
     }
 
     public void update(UserDto userDto) {
         this.email = userDto.getEmail();
+        this.nickName = userDto.getNickName();
         this.password = userDto.getPassword();
         this.phoneNumber = userDto.getPhoneNumber();
     }

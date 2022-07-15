@@ -51,6 +51,7 @@ public class LoginControllerTest {
     public UserDto UserDtoTest() {
         return UserDto.builder()
                 .email("gmail@email.com")
+                .nickName("테스트 유저")
                 .password(passwordEncoder.encode("1234"))
                 .phoneNumber("01012345678")
                 .build();
