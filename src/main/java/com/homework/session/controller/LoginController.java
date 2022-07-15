@@ -26,14 +26,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public void login(@Valid @RequestBody UserDto userDto, HttpServletResponse response) {
-        loginService.login(userDto.getEmail(), userDto.getPassword());
-
-        UserDto saveDto = UserDto.builder()
-                .email(userDto.getEmail())
-                .password(passwordEncoder.encode(userDto.getPassword()))
-                .build();
-
-        sessionManager.createSession(saveDto, response);
+        loginService.login(userDto.getEmail(), userDto.getPassword(), response);
     }
 
     @GetMapping("/logout")
@@ -48,19 +41,11 @@ public class LoginController {
 
     @PutMapping("/update")
     public void updateUser(@RequestBody UserDto userDto, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-
-        if (session == sessionManager.getSession(request)) {
-            loginService.update(userDto);
-        }
+        loginService.update(userDto, request);
     }
 
     @DeleteMapping("/delete")
     public void deleteUser(@RequestBody UserDto userDto, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-
-        if (session == sessionManager.getSession(request)) {
-            loginService.delete(userDto);
-        }
+            loginService.delete(userDto, request);
     }
 }
