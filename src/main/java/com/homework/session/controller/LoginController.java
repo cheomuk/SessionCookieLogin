@@ -25,8 +25,8 @@ public class LoginController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public void login(@Valid @RequestBody UserDto userDto, HttpServletResponse response) {
-        loginService.login(userDto.getEmail(), userDto.getPassword(), response);
+    public void login(@Valid @RequestBody UserDto userDto, HttpServletRequest request) {
+        loginService.login(userDto.getEmail(), userDto.getPassword(), request);
     }
 
     @GetMapping("/logout")

@@ -59,12 +59,12 @@ public class LoginServiceTest {
                 .password("1234")
                 .build();
 
-        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockHttpServletRequest request = new MockHttpServletRequest();
 
         assertThat(userDto.getEmail().equals(testDto.getEmail()));
         assertThat(passwordEncoder.matches(userDto.getPassword(), testDto.getPassword()));
 
-        loginService.login(testDto.getEmail(), testDto.getPassword(), response);
+        loginService.login(testDto.getEmail(), testDto.getPassword(), request);
     }
 
     @Test
