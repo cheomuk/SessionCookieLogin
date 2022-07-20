@@ -31,7 +31,7 @@ public class LoginService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void login(String email, String password, HttpServletResponse response) {
+    public void login(String email, String password, HttpServletRequest request) {
         userRepository.findByEmail(email)
                 .filter(u -> passwordEncoder.matches(password, u.getPassword()))
                 .orElseThrow(() -> { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
@@ -41,7 +41,8 @@ public class LoginService {
                 .password(passwordEncoder.encode(password))
                 .build();
 
-        sessionManager.createSession(userDto, response);
+        HttpSession session = request.getSession();
+        session.setAttribute("sessionId", userDto);
     }
 
     @Transactional
@@ -74,8 +75,9 @@ public class LoginService {
                 .build();
 
         HttpSession session = request.getSession();
+        UserDto loginUser = (UserDto) session.getAttribute("sessionId");
 
-        if (session != null) {
+        if ( loginUser != null ) {
             user.update(updateDto);
         }
     }
@@ -86,8 +88,9 @@ public class LoginService {
             { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         HttpSession session = request.getSession();
+        UserDto loginUser = (UserDto) session.getAttribute("sessionId");
 
-        if (session != null) {
+        if ( loginUser != null ) {
             userRepository.delete(user);
         }
     }
