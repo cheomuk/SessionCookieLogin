@@ -31,7 +31,7 @@ public class BoardService {
         } else if (boardRepository.findMyNickname(keyword) != null) {
             return boardRepository.findByNickname(keyword, pageable);
         } else {
-            throw new UnAuthorizedException("값 호환 안됨", ACCESS_DENIED_EXCEPTION);
+            throw new UnAuthorizedException("찾는 결과가 없습니다.", ACCESS_DENIED_EXCEPTION);
         }
     }
 
