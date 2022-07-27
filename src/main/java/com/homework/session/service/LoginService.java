@@ -4,7 +4,6 @@ import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.UserDto;
 import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
-import com.homework.session.sessionManager.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -25,7 +23,6 @@ import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 public class LoginService {
 
     private final UserRepository userRepository;
-    private final SessionManager sessionManager;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

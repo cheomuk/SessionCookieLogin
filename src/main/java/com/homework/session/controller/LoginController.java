@@ -2,7 +2,6 @@ package com.homework.session.controller;
 
 import com.homework.session.dto.UserDto;
 import com.homework.session.service.LoginService;
-import com.homework.session.sessionManager.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -18,7 +16,6 @@ import javax.validation.Valid;
 @Slf4j
 @RequiredArgsConstructor
 public class LoginController {
-    private final SessionManager sessionManager;
     private final LoginService loginService;
 
     @Autowired

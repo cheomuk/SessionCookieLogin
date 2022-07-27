@@ -1,5 +1,6 @@
 package com.homework.session.dto;
 
+import com.homework.session.entity.BoardList;
 import com.homework.session.enumcustom.BoardEnumCustom;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
