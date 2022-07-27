@@ -1,9 +1,14 @@
 package com.homework.session.controller;
 
 import com.homework.session.dto.BoardListDto;
+import com.homework.session.entity.BoardList;
 import com.homework.session.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,13 +19,13 @@ public class BoardController {
     private final BoardService boardService;
 
     @GetMapping("/")
-    public void getAllBoardList() {
-        boardService.getAllBoardList();
+    public Page<BoardList> getAllBoardList(@PageableDefault Pageable pageable) {
+        return boardService.getAllBoardList(pageable);
     }
 
     @GetMapping("/filter")
-    public void getBoardList(@RequestBody BoardListDto boardListDto) {
-        boardService.getBoardList(boardListDto);
+    public Page<BoardList> getBoardList(@RequestParam String keyword, @PageableDefault Pageable pageable) {
+        return boardService.getBoardList(keyword, pageable);
     }
 
     @PostMapping("/list/create")

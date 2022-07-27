@@ -6,8 +6,13 @@ import com.homework.session.entity.BoardList;
 import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
@@ -20,22 +25,22 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public void getBoardList(BoardListDto boardListDto) {
-        BoardList boardList = BoardList.builder()
-                .nickname(boardListDto.getNickname())
-                .title(boardListDto.getTitle())
-                .build();
-
-        if (boardListDto.getNickname() != null) {
-            boardRepository.findByNickname(boardListDto.getNickname());
-        } else if (boardListDto.getTitle() != null) {
-            boardRepository.findByTitle(boardListDto.getTitle());
+    public Page<BoardList> getBoardList(String keyword, Pageable pageable) {
+        if (boardRepository.findMyTitle(keyword) != null) {
+            return boardRepository.findByTitle(keyword, pageable);
+        } else if (boardRepository.findMyNickname(keyword) != null) {
+            return boardRepository.findByNickname(keyword, pageable);
+        } else {
+            throw new UnAuthorizedException("값 호환 안됨", ACCESS_DENIED_EXCEPTION);
         }
     }
 
     @Transactional
-    public void getAllBoardList() {
-        boardRepository.findAll();
+    public Page<BoardList> getAllBoardList(Pageable pageable) {
+        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);
+        pageable = PageRequest.of(page, 10);
+
+        return boardRepository.findAll(pageable);
     }
 
     @Transactional
