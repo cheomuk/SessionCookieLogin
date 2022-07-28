@@ -50,11 +50,21 @@ public class LoginControllerTest {
 
     public UserDto UserDtoTest() {
         return UserDto.builder()
-                .email("gmail@email.com")
-                .nickName("테스트 유저")
-                .password(passwordEncoder.encode("1234"))
-                .phoneNumber("01012345678")
+                .email("testgmail@gmail.com")
+                .nickname("테스트 유저1")
+                .password("1234")
+                .phoneNumber("01012345679")
                 .build();
+    }
+
+    @Test
+    public void signUp_Test() throws Exception {
+        UserDto userDto = UserDtoTest();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -65,31 +75,6 @@ public class LoginControllerTest {
                             .build();
 
         mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userDto)))
-                        .andExpect(status().isOk());
-    }
-
-    @Test
-    public void logout_Test() throws Exception {
-        UserDto userDto = UserDtoTest();
-
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        sessionManager.createSession(userDto, response);
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setCookies(response.getCookies());
-
-        sessionManager.expire(request);
-        Object expiredSession = sessionManager.getSession(request);
-        assertThat(expiredSession).isNull();
-    }
-
-    @Test
-    public void signUp_Test() throws Exception {
-        UserDto userDto = UserDtoTest();
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                         .andExpect(status().isOk());
@@ -115,5 +100,20 @@ public class LoginControllerTest {
                         .andExpect(status().isOk());
 
         assertThat(userRepository.findByEmail(UserDtoTest().getEmail()).isEmpty());
+    }
+
+    @Test
+    public void logout_Test() throws Exception {
+        UserDto userDto = UserDtoTest();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        sessionManager.createSession(userDto, response);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setCookies(response.getCookies());
+
+        sessionManager.expire(request);
+        Object expiredSession = sessionManager.getSession(request);
+        assertThat(expiredSession).isNull();
     }
 }

@@ -42,53 +42,65 @@ public class LoginServiceTest {
 
     public UserDto UserDtoTest() {
         return UserDto.builder()
-                .email("testemail1@email.com")
-                .nickName("테스트 유저2")
+                .email("testgmail@gmail.com")
+                .nickname("테스트 유저1")
                 .password(passwordEncoder.encode("1234"))
                 .phoneNumber("01012345679")
                 .build();
     }
 
     @Test
+    public void serviceSignUp_Test() throws Exception {
+        UserDto userDto = UserDtoTest();
+
+        if (userRepository.findByEmail(userDto.getEmail()) == null) {
+            loginService.signUp(userDto);
+        }
+
+        UserDto testDto = UserDto.builder()
+                .email("testemail5@email.com")
+                .nickname("테스트 유저5")
+                .password("1234")
+                .phoneNumber("01099998888")
+                .build();
+
+        assertNotEquals(userDto.getEmail(), testDto.getEmail());
+        assertNotEquals(userDto.getNickname(), testDto.getNickname());
+        loginService.signUp(testDto);
+    }
+
+    @Test
     public void serviceLogin_Test() throws Exception {
         UserDto userDto = UserDtoTest();
 
+        if (userRepository.findByEmail(userDto.getEmail()) == null) {
+            loginService.signUp(userDto);
+        }
+
         UserDto testDto = UserDto.builder()
-                .email("testemail1@email.com")
-                .nickName("테스트 유저2")
+                .email("testgmail@gmail.com")
                 .password("1234")
                 .build();
 
         MockHttpServletRequest request = new MockHttpServletRequest();
 
         assertThat(userDto.getEmail().equals(testDto.getEmail()));
-        assertThat(passwordEncoder.matches(userDto.getPassword(), testDto.getPassword()));
+        assertThat(passwordEncoder.matches(testDto.getPassword(), userDto.getPassword()));
 
         loginService.login(testDto.getEmail(), testDto.getPassword(), request);
-    }
-
-    @Test
-    public void serviceSignUp_Test() throws Exception {
-        UserDto userDto = UserDtoTest();
-
-        UserDto testDto = UserDto.builder()
-                .email("testemail6@email.com")
-                .nickName("테스트 유저2")
-                .password("1234")
-                .phoneNumber("01099998888")
-                .build();
-
-        assertNotEquals(userDto.getEmail(), testDto.getEmail());
-        loginService.signUp(testDto);
     }
 
     @Test
     public void serviceUpdate_Test() throws Exception {
         UserDto userDto = UserDtoTest();
 
+        if (userRepository.findByEmail(userDto.getEmail()) == null) {
+            loginService.signUp(userDto);
+        }
+
         UserDto testDto = UserDto.builder()
-                .email("testemail1@email.com")
-                .nickName("테스트 유저2")
+                .email("testgmail@gmail.com")
+                .nickname("테스트 유저1")
                 .password("1234")
                 .phoneNumber("01012344321")
                 .build();
@@ -103,18 +115,17 @@ public class LoginServiceTest {
     public void serviceDelete_Test() throws Exception {
         UserDto userDto = UserDtoTest();
 
+        if (userRepository.findByEmail(userDto.getEmail()) == null) {
+            loginService.signUp(userDto);
+        }
+
         UserDto testDto = UserDto.builder()
-                .email("testemail1@email.com")
+                .email("testgmail@gmail.com")
                 .build();
 
         MockHttpServletRequest request = new MockHttpServletRequest();
 
         assertThat(userDto.getEmail()).isEqualTo(testDto.getEmail());
         loginService.delete(testDto, request);
-    }
-
-    @After
-    public void TestEnd() {
-        userRepository.deleteAll();
     }
 }

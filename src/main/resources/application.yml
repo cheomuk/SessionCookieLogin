@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/sessionlogin
+    url: jdbc:h2:~/sessionlogin;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE;MODE=MySQL
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -9,7 +9,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     open-in-view: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true

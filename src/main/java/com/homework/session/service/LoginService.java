@@ -50,7 +50,7 @@ public class LoginService {
 
         User user = User.builder()
                 .email(userDto.getEmail())
-                .nickName(userDto.getNickName())
+                .nickname(userDto.getNickname())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .phoneNumber(userDto.getPhoneNumber())
                 .build();
@@ -66,7 +66,7 @@ public class LoginService {
 
         UserDto updateDto = UserDto.builder()
                 .email(userDto.getEmail())
-                .nickName(userDto.getNickName())
+                .nickname(userDto.getNickname())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .phoneNumber(userDto.getPhoneNumber())
                 .build();
