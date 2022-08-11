@@ -1,6 +1,7 @@
 package com.homework.session.entity;
 
 import com.homework.session.dto.UserDto;
+import com.homework.session.enumcustom.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,24 +26,33 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String nickname;
 
-    @Column(nullable = false, length = 60)
-    private String password;
+    @Column
+    private String picture;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole userRole;
 
     @Column
-    private String phoneNumber;
+    private String introduction;
 
     @Builder
-    public User(String email, String nickname, String password, String phoneNumber) {
+    public User(String email, String nickname, String picture, UserRole userRole, String introduction) {
         this.email = email;
         this.nickname = nickname;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
+        this.picture = picture;
+        this.userRole = userRole;
+        this.introduction = introduction;
     }
 
     public void update(UserDto userDto) {
-        this.email = userDto.getEmail();
         this.nickname = userDto.getNickname();
-        this.password = userDto.getPassword();
-        this.phoneNumber = userDto.getPhoneNumber();
+        this.picture = userDto.getPicture();
+        this.userRole = userDto.getUserRole();
+        this.introduction = userDto.getIntroduction();
+    }
+
+    public String getRoleKey() {
+        return this.userRole.getKey();
     }
 }

@@ -1,24 +1,34 @@
 package com.homework.session.config;
 
-import org.springframework.context.annotation.Bean;
+import com.homework.session.service.CustomOAuth2UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors().disable()
-                .headers().frameOptions().disable();
-    }
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
+                .and()
+                .formLogin().disable()
+                .authorizeRequests().anyRequest().permitAll()
+
+                .and()
+                .logout()
+                .logoutSuccessUrl("/")
+
+                .and()
+                .oauth2Login()
+                .userInfoEndpoint().userService(customOAuth2UserService);
     }
 }

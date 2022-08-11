@@ -5,11 +5,12 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum BoardEnumCustom {
+public enum UserRole {
 
-    BEFORE("ROLE_BEFORE", "의뢰 전"),
-    REQUESTING("ROLE_REQUESTING", "의뢰 중"),
-    COMPLETE("ROLE_COMPLETE", "의뢰 완료");
+    GUEST("ROLE_GUEST", "손님"),
+    USER("ROLE_USER", "일반 사용자"),
+    ARTIST("ROLE_ARTIST", "아티스트"),
+    ADMINISTRATOR("ROLE_ADMINISTRATOR", "관리자");
 
     private final String key;
     private final String title;

@@ -1,26 +1,31 @@
 package com.homework.session.dto;
 
+import com.homework.session.entity.User;
+import com.homework.session.enumcustom.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class UserDto implements Serializable {
 
-    private Long id;
-    private String email;
     private String nickname;
-    private String password;
-    private String phoneNumber;
+    private String email;
+    private String picture;
+    private String introduction;
+    private UserRole userRole;
 
-    public UserDto(UserDto userDto) {
-        this.email = userDto.getEmail();
-        this.nickname = userDto.getNickname();
-        this.password = userDto.getPassword();
-        this.phoneNumber = userDto.getPhoneNumber();
+    public UserDto(User user) {
+        this.email = user.getEmail();
+        this.nickname = user.getNickname();
+        this.picture = user.getPicture();
+        this.introduction = user.getIntroduction();
+        this.userRole = user.getUserRole();
     }
 }
