@@ -2,7 +2,8 @@ package com.homework.session.service;
 
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.OAuthAttributes;
-import com.homework.session.dto.UserDto;
+import com.homework.session.dto.UserDto.UserRequestDto;
+import com.homework.session.dto.UserDto.UserResponseDto;
 import com.homework.session.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,7 +35,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthAttributes attributes = OAuthAttributes.of(userNameAttributeName, oAuth2User.getAttributes());
 
         User user = saveOrUpdate(attributes);
-        httpSession.setAttribute("user", new UserDto(user));
+        httpSession.setAttribute("user", new UserResponseDto(user));
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),

@@ -1,14 +1,16 @@
 package com.homework.session.controller;
 
-import com.homework.session.dto.BoardListDto;
+import com.homework.session.config.LoginUser;
+import com.homework.session.dto.BoardDto.BoardRequestDto;
+import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,23 +25,31 @@ public class BoardController {
         return boardService.getAllBoardList(pageable);
     }
 
-    @GetMapping("/filter")
-    public Page<BoardList> getBoardList(@RequestParam String keyword, @PageableDefault Pageable pageable) {
-        return boardService.getBoardList(keyword, pageable);
+    @GetMapping("/filter/title")
+    public Page<BoardList> getTitleBoardList(@RequestParam String keyword, @PageableDefault Pageable pageable) {
+        return boardService.getTitleBoardList(keyword, pageable);
+    }
+
+    @GetMapping("/filter/nickname")
+    public Page<BoardList> getNicknameBoardList(@RequestParam String keyword, @PageableDefault Pageable pageable) {
+        return boardService.getNicknameBoardList(keyword, pageable);
     }
 
     @PostMapping("/list/create")
-    public void createBoard(@RequestBody BoardListDto boardListDto) {
+    public ResponseEntity<String> createBoard(@RequestBody BoardRequestDto boardListDto) {
         boardService.createBoard(boardListDto);
+        return ResponseEntity.ok("게시글이 등록되었습니다.");
     }
 
     @PutMapping("/list/update")
-    public void updateBoard(@RequestBody BoardListDto boardListDto) {
+    public ResponseEntity<String> updateBoard(@RequestBody BoardRequestDto boardListDto) {
         boardService.updateBoard(boardListDto);
+        return ResponseEntity.ok("게시글이 수정되었습니다.");
     }
 
-    @DeleteMapping("/list/delete")
-    public void deleteBoard(@RequestBody BoardListDto boardListDto) {
-        boardService.deleteBoard(boardListDto);
+    @DeleteMapping("/list/delete}")
+    public ResponseEntity<String> deleteBoard(@PathVariable Long id) {
+        boardService.deleteBoard(id);
+        return ResponseEntity.ok("게시글이 삭제되었습니다.");
     }
 }

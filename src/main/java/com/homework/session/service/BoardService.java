@@ -1,8 +1,12 @@
 package com.homework.session.service;
 
 import com.homework.session.Repository.BoardRepository;
-import com.homework.session.dto.BoardListDto;
+import com.homework.session.Repository.UserRepository;
+import com.homework.session.config.LoginUser;
+import com.homework.session.dto.BoardDto.BoardRequestDto;
+import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.entity.BoardList;
+import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,16 +25,16 @@ import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public Page<BoardList> getBoardList(String keyword, Pageable pageable) {
-        if (boardRepository.findMyTitle(keyword) != null) {
-            return boardRepository.findByTitle(keyword, pageable);
-        } else if (boardRepository.findMyNickname(keyword) != null) {
-            return boardRepository.findByNickname(keyword, pageable);
-        } else {
-            throw new UnAuthorizedException("찾는 결과가 없습니다.", ACCESS_DENIED_EXCEPTION);
-        }
+    public Page<BoardList> getTitleBoardList(String keyword, Pageable pageable) {
+        return boardRepository.findByTitle(keyword, pageable);
+    }
+
+    @Transactional
+    public Page<BoardList> getNicknameBoardList(String keyword, Pageable pageable) {
+        return boardRepository.findByNickname(keyword, pageable);
     }
 
     @Transactional
@@ -42,29 +46,27 @@ public class BoardService {
     }
 
     @Transactional
-    public void createBoard(BoardListDto boardListDto) {
-        BoardList boardList = BoardList.builder()
-                    .nickname(boardListDto.getNickname())
-                    .title(boardListDto.getTitle())
-                    .questEnum(boardListDto.getQuestEnum())
-                    .context(boardListDto.getContext())
-                    .questDate(boardListDto.getQuestDate())
-                    .build();
+    public Long createBoard(BoardRequestDto boardListDto) {
 
+        User user = userRepository.findByNickname(boardListDto.getNickname());
+        boardListDto.setUser(user);
+        BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
+
+        return boardList.getId();
     }
 
     @Transactional
-    public void updateBoard(BoardListDto boardListDto) {
-        BoardList boardList = boardRepository.findByNicknameAndTitle(boardListDto.getNickname(), boardListDto.getTitle())
+    public void updateBoard(BoardRequestDto boardListDto) {
+        BoardList boardList = boardRepository.findById(boardListDto.getId())
                 .orElseThrow(() -> { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         boardList.update(boardListDto);
     }
 
     @Transactional
-    public void deleteBoard(BoardListDto boardListDto) {
-        BoardList boardList = boardRepository.findByNicknameAndTitle(boardListDto.getNickname(), boardListDto.getTitle())
+    public void deleteBoard(Long id) {
+        BoardList boardList = boardRepository.findById(id)
                 .orElseThrow(() -> { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         boardRepository.delete(boardList);

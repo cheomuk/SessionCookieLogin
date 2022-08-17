@@ -2,7 +2,7 @@ package com.homework.session.service;
 
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.config.LoginUser;
-import com.homework.session.dto.UserDto;
+import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -21,15 +21,14 @@ public class LoginService {
     private final UserRepository userRepository;
 
     @Transactional
-    public String signUp(UserDto userDto) {
-        if (userRepository.existsByEmail(userDto.getNickname())) {
+    public String signUp(UserRequestDto userDto) {
+        if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
         User user = User.builder()
                 .email(userDto.getEmail())
                 .nickname(userDto.getNickname())
-                .picture(userDto.getPicture())
                 .introduction(userDto.getIntroduction())
                 .userRole(userDto.getUserRole())
                 .build();
@@ -45,12 +44,12 @@ public class LoginService {
     }
 
     @Transactional
-    public UserDto myPage(UserDto userDto, @LoginUser UserDto loginUser) {
-        if (loginUser == null) {
-            throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
-        }
+    public UserRequestDto myPage(UserRequestDto userDto) {
+//        if (loginUser == null) {
+//            throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
+//        }
 
-        UserDto myDto = UserDto.builder()
+        UserRequestDto myDto = UserRequestDto.builder()
                 .nickname(userDto.getNickname())
                 .userRole(userDto.getUserRole())
                 .introduction(userDto.getIntroduction())
@@ -61,24 +60,7 @@ public class LoginService {
     }
 
     @Transactional
-    public void update(UserDto userDto, @LoginUser UserDto loginUser) {
-
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
-
-        UserDto updateDto = UserDto.builder()
-                .nickname(userDto.getNickname())
-                .picture(userDto.getPicture())
-                .introduction(userDto.getIntroduction())
-                .build();
-
-        if ( loginUser != null ) {
-            user.update(updateDto);
-        }
-    }
-
-    @Transactional
-    public void delete(UserDto userDto, @LoginUser UserDto loginUser) {
+    public void delete(UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
         User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
             { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
