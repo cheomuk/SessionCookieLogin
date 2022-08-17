@@ -1,7 +1,8 @@
 package com.homework.session.entity;
 
-import com.homework.session.dto.UserDto;
+import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.enumcustom.UserRole;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,22 +13,21 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
-@Table(name = "user_profile")
+@Table(name = "users")
 public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false, unique = true)
     private String nickname;
-
-    @Column
-    private String picture;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -36,18 +36,8 @@ public class User extends BaseTimeEntity {
     @Column
     private String introduction;
 
-    @Builder
-    public User(String email, String nickname, String picture, UserRole userRole, String introduction) {
-        this.email = email;
-        this.nickname = nickname;
-        this.picture = picture;
-        this.userRole = userRole;
-        this.introduction = introduction;
-    }
-
-    public void update(UserDto userDto) {
+    public void update(UserRequestDto userDto) {
         this.nickname = userDto.getNickname();
-        this.picture = userDto.getPicture();
         this.userRole = userDto.getUserRole();
         this.introduction = userDto.getIntroduction();
     }

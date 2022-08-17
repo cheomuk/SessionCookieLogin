@@ -1,11 +1,13 @@
 package com.homework.session.controller;
 
+import com.homework.session.Repository.UserRepository;
 import com.homework.session.config.LoginUser;
-import com.homework.session.dto.UserDto;
+import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.service.CustomOAuth2UserService;
 import com.homework.session.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpSession;
 public class LoginController {
 
     private final LoginService loginService;
+    private final UserRepository userRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final HttpSession httpSession;
 
@@ -25,17 +28,19 @@ public class LoginController {
     public String login(OAuth2UserRequest userRequest) {
         customOAuth2UserService.loadUser(userRequest);
 
-        return "/signup";
+        return "redirect:/signup";
     }
 
     @GetMapping("/logout")
-    public void logout(HttpServletRequest request) {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         httpSession.invalidate();
+        return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 
     @PostMapping("/signup")
-    public void signUp(@RequestBody UserDto userDto) {
+    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
         loginService.signUp(userDto);
+        return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
     @PostMapping("/signup/checkbox")
@@ -43,13 +48,15 @@ public class LoginController {
         return loginService.checkNickname(nickname);
     }
 
-    @PutMapping("/update")
-    public void updateUser(@RequestBody UserDto userDto, @LoginUser UserDto loginUser) {
-        loginService.update(userDto, loginUser);
+    @PutMapping("/mypage")
+    public ResponseEntity<String> myPage(@RequestBody UserRequestDto userDto) {
+        loginService.myPage(userDto);
+        return ResponseEntity.ok("회원정보가 수정되었습니다.");
     }
 
     @DeleteMapping("/delete")
-    public void deleteUser(@RequestBody UserDto userDto, @LoginUser UserDto loginUser) {
+    public ResponseEntity<String> deleteUser(@RequestBody UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
         loginService.delete(userDto, loginUser);
+        return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
     }
 }

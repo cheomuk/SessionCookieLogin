@@ -1,26 +1,30 @@
 package com.homework.session.entity;
 
-import com.homework.session.dto.BoardListDto;
+import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.enumcustom.BoardEnumCustom;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import java.util.List;
+
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
-@Table(name = "board_list")
 public class BoardList extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String nickname;
 
     @Column(nullable = false)
@@ -33,23 +37,17 @@ public class BoardList extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String context;
 
-    @Column
-    private String questDate;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "board_list")
+    private User user;
 
-    @Builder
-    public BoardList(String nickname, String title, BoardEnumCustom questEnum, String context, String questDate) {
-        this.nickname = nickname;
-        this.title = title;
-        this.questEnum = questEnum;
-        this.context = context;
-        this.questDate = questDate;
-    }
+    @OneToMany(mappedBy = "boardList", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OrderBy("id asc") // 오름차순 정렬
+    private List<Comment> comments;
 
-    public void update(BoardListDto boardListDto) {
-        this.nickname = boardListDto.getNickname();
+    public void update(BoardRequestDto boardListDto) {
         this.title = boardListDto.getTitle();
         this.questEnum = boardListDto.getQuestEnum();
         this.context = boardListDto.getContext();
-        this.questDate = boardListDto.getQuestDate();
     }
 }
