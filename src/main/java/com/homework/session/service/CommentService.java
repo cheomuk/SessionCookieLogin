@@ -42,24 +42,24 @@ public class CommentService {
     }
 
     @Transactional
-    public List<CommentResponseDto> readComment(CommentRequestDto commentRequestDto) {
-        BoardList boardList = boardRepository.findById(commentRequestDto.getId()).orElseThrow(() ->
+    public List<CommentResponseDto> readComment(Long id) {
+        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
                 new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION));
         List<Comment> comments = boardList.getComments();
         return comments.stream().map(CommentResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateComment(CommentRequestDto commentRequestDto) {
-        Comment comment = commentRepository.findById(commentRequestDto.getId()).orElseThrow(() ->
+    public void updateComment(Long id, CommentRequestDto commentRequestDto) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() ->
                 new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION));
 
         comment.update(commentRequestDto.getComment());
     }
 
     @Transactional
-    public void deleteComment(CommentRequestDto commentRequestDto) {
-        Comment comment = commentRepository.findById(commentRequestDto.getId()).orElseThrow(() ->
+    public void deleteComment(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() ->
                 new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION));
 
         commentRepository.delete(comment);

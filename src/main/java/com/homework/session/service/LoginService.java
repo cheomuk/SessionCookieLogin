@@ -44,10 +44,10 @@ public class LoginService {
     }
 
     @Transactional
-    public UserRequestDto myPage(UserRequestDto userDto) {
-//        if (loginUser == null) {
-//            throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
-//        }
+    public UserRequestDto myPage(UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
+        if (loginUser == null) {
+            throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
+        }
 
         UserRequestDto myDto = UserRequestDto.builder()
                 .nickname(userDto.getNickname())

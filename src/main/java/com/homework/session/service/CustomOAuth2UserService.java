@@ -1,8 +1,9 @@
 package com.homework.session.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.OAuthAttributes;
-import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.dto.UserDto.UserResponseDto;
 import com.homework.session.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +11,18 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collections;
 
 @RequiredArgsConstructor
@@ -48,5 +55,51 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .orElse(attributes.toEntity());
 
         return userRepository.save(user);
+    }
+
+    public String findKakaoUser(OAuth2AccessToken accessToken) {
+
+        String reqURL = "https://kapi.kakao.com/v2/user/me";
+        String token = accessToken.toString();
+
+        try {
+            URL url = new URL(reqURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Authorization", "Bearer " + token);
+
+            int responseCode = conn.getResponseCode();
+            System.out.println("responseCode : " + responseCode);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line = "";
+            String result = "";
+
+            while ((line = br.readLine()) != null) {
+                result += line;
+            }
+            System.out.println("response body : " + result);
+
+            JsonParser parser = new JsonParser();
+            JsonElement element = parser.parse(result);
+
+            int id = element.getAsJsonObject().get("id").getAsInt();
+            boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
+            String email = "";
+            if(hasEmail){
+                email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
+            }
+
+            System.out.println("id : " + id);
+            System.out.println("email : " + email);
+
+            br.close();
+            return email;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
