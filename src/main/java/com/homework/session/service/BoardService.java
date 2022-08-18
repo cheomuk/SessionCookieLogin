@@ -46,9 +46,9 @@ public class BoardService {
     }
 
     @Transactional
-    public Long createBoard(BoardRequestDto boardListDto) {
+    public Long createBoard(BoardRequestDto boardListDto, String nickname) {
 
-        User user = userRepository.findByNickname(boardListDto.getNickname());
+        User user = userRepository.findByNickname(nickname);
         boardListDto.setUser(user);
         BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
@@ -57,8 +57,8 @@ public class BoardService {
     }
 
     @Transactional
-    public void updateBoard(BoardRequestDto boardListDto) {
-        BoardList boardList = boardRepository.findById(boardListDto.getId())
+    public void updateBoard(Long id, BoardRequestDto boardListDto) {
+        BoardList boardList = boardRepository.findById(id)
                 .orElseThrow(() -> { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         boardList.update(boardListDto);

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,8 +29,14 @@ public class LoginController {
     @PostMapping("/oauth2/authorization/kakao")
     public String login(OAuth2UserRequest userRequest) {
         customOAuth2UserService.loadUser(userRequest);
+        OAuth2AccessToken tokenRequest = userRequest.getAccessToken();
+        String email = customOAuth2UserService.findKakaoUser(tokenRequest);
 
-        return "redirect:/signup";
+        if (userRepository.findByEmail(email) != null) {
+            return "/";
+        } else {
+            return "/signup";
+        }
     }
 
     @GetMapping("/logout")
@@ -37,7 +45,7 @@ public class LoginController {
         return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/signup/first")
     public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
         loginService.signUp(userDto);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
@@ -48,13 +56,14 @@ public class LoginController {
         return loginService.checkNickname(nickname);
     }
 
-    @PutMapping("/mypage")
-    public ResponseEntity<String> myPage(@RequestBody UserRequestDto userDto) {
-        loginService.myPage(userDto);
+
+    @PutMapping("/mypage/update")
+    public ResponseEntity<String> myPage(@RequestBody UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
+        loginService.myPage(userDto, loginUser);
         return ResponseEntity.ok("회원정보가 수정되었습니다.");
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/mypage/delete")
     public ResponseEntity<String> deleteUser(@RequestBody UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
         loginService.delete(userDto, loginUser);
         return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");

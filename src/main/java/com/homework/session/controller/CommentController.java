@@ -19,27 +19,27 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping("/list/create/comments")
+    @PostMapping("/list/{id}/comments")
     public ResponseEntity createComment(@RequestBody CommentRequestDto commentRequestDto,
                                         @LoginUser UserResponseDto userLogin) {
         return ResponseEntity.ok(commentService.createComment(commentRequestDto.getId(),
                 userLogin.getNickname(), commentRequestDto));
     }
 
-    @GetMapping("/list/read/comments")
-    public List<CommentResponseDto> readComment(@RequestBody CommentRequestDto commentRequestDto) {
-        return commentService.readComment(commentRequestDto);
+    @GetMapping("/list/{id}/comments")
+    public List<CommentResponseDto> readComment(@PathVariable Long id) {
+        return commentService.readComment(id);
     }
 
-    @PutMapping({"/list/update/comments"})
-    public ResponseEntity updateComment(@RequestBody CommentRequestDto commentRequestDto) {
-        commentService.updateComment(commentRequestDto);
-        return ResponseEntity.ok(commentRequestDto.getId());
+    @PutMapping("/list/{id}/comments/{id}")
+    public ResponseEntity updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto) {
+        commentService.updateComment(id, commentRequestDto);
+        return ResponseEntity.ok(id);
     }
 
-    @DeleteMapping("/list/delete/comments")
-    public ResponseEntity delete(@RequestBody CommentRequestDto commentRequestDto) {
-        commentService.deleteComment(commentRequestDto);
-        return ResponseEntity.ok(commentRequestDto.getId());
+    @DeleteMapping("/list/{id}/comments/{id}")
+    public ResponseEntity delete(@PathVariable Long id) {
+        commentService.deleteComment(id);
+        return ResponseEntity.ok(id);
     }
 }
