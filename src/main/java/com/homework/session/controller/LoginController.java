@@ -63,8 +63,8 @@ public class LoginController {
     }
 
     @DeleteMapping("/mypage/delete")
-    public ResponseEntity<String> deleteUser(@RequestBody UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
-        loginService.delete(userDto, loginUser);
+    public ResponseEntity<String> deleteUser(String nickname, @LoginUser UserRequestDto loginUser) {
+        loginService.delete(nickname, loginUser);
         return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
     }
 }
