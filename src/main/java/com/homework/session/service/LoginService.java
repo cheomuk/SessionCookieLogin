@@ -27,11 +27,11 @@ public class LoginService {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        String email = customOAuth2UserService.findKakaoUser(userDto.getToken());
+//        String email = customOAuth2UserService.findKakaoUser(userDto.getToken());
 
         User user = User.builder()
                 .nickname(userDto.getNickname())
-                .email(email)
+                .email("재민이 테스트")
                 .introduction(userDto.getIntroduction())
                 .userRole(userDto.getUserRole())
                 .build();
