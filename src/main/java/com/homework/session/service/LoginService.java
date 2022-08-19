@@ -7,7 +7,6 @@ import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,11 +52,8 @@ public class LoginService {
             throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        String email = loginUser.getEmail();
-
         UserRequestDto myDto = UserRequestDto.builder()
                 .nickname(userDto.getNickname())
-                .email(email)
                 .userRole(userDto.getUserRole())
                 .introduction(userDto.getIntroduction())
                 .build();
