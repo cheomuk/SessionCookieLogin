@@ -57,7 +57,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return userRepository.save(user);
     }
 
-    public String findKakaoUser(OAuth2AccessToken accessToken) {
+    public String findKakaoUser(String accessToken) {
 
         String reqURL = "https://kapi.kakao.com/v2/user/me";
         String token = accessToken.toString();

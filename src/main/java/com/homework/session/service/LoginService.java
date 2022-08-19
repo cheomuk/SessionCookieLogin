@@ -23,12 +23,12 @@ public class LoginService {
     private final CustomOAuth2UserService customOAuth2UserService;
 
     @Transactional
-    public String signUp(UserRequestDto userDto, OAuth2AccessToken tokenRequest) {
+    public String signUp(UserRequestDto userDto) {
         if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        String email = customOAuth2UserService.findKakaoUser(tokenRequest);
+        String email = customOAuth2UserService.findKakaoUser(userDto.getToken());
 
         User user = User.builder()
                 .nickname(userDto.getNickname())
