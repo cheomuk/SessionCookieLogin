@@ -27,7 +27,6 @@ public class LoginService {
         }
 
         User user = User.builder()
-                .email(userDto.getEmail())
                 .nickname(userDto.getNickname())
                 .introduction(userDto.getIntroduction())
                 .userRole(userDto.getUserRole())
