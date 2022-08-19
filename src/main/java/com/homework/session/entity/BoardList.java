@@ -37,7 +37,7 @@ public class BoardList extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String context;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_list")
     private User user;
 
