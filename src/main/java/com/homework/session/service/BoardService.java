@@ -4,6 +4,7 @@ import com.homework.session.Repository.BoardRepository;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.config.LoginUser;
 import com.homework.session.dto.BoardDto.BoardRequestDto;
+import com.homework.session.dto.BoardDto.BoardResponseDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.entity.User;
@@ -35,6 +36,14 @@ public class BoardService {
     @Transactional
     public Page<BoardList> getNicknameBoardList(String keyword, Pageable pageable) {
         return boardRepository.findByNickname(keyword, pageable);
+    }
+
+    @Transactional
+    public BoardResponseDto findBoardList(Long id) {
+        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        return new BoardResponseDto(boardList);
     }
 
     @Transactional
