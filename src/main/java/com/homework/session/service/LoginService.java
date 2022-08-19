@@ -59,8 +59,8 @@ public class LoginService {
     }
 
     @Transactional
-    public void delete(UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() ->
+    public void delete(String nickname, @LoginUser UserRequestDto loginUser) {
+        User user = userRepository.findByEmail(nickname).orElseThrow(() ->
             { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         if ( loginUser != null ) {
