@@ -33,9 +33,9 @@ public class LoginController {
         String email = customOAuth2UserService.findKakaoUser(tokenRequest);
 
         if (userRepository.findByEmail(email) != null) {
-            return "/main";
+            return "redirect:/main";
         } else {
-            return "/signUp";
+            return "redirect:/signUp";
         }
     }
 
