@@ -17,7 +17,6 @@ public class UserRequestDto {
     @NotBlank(message = "닉네임은 필수 입력 값입니다.")
     private String nickname;
 
-    private String email;
     private String introduction;
     private UserRole userRole;
     private String token;
@@ -25,7 +24,6 @@ public class UserRequestDto {
     public User toEntity() {
         User user = User.builder()
                 .nickname(nickname)
-                .email(email)
                 .introduction(introduction)
                 .userRole(userRole)
                 .build();
