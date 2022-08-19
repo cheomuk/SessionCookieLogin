@@ -20,7 +20,7 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @GetMapping("/")
+    @GetMapping("/main")
     public Page<BoardList> getAllBoardList(@PageableDefault Pageable pageable) {
         return boardService.getAllBoardList(pageable);
     }
