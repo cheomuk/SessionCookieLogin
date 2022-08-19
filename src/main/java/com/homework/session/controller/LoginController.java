@@ -28,7 +28,7 @@ public class LoginController {
     @PostMapping("/oauth2/authorization/kakao")
     public String login(OAuth2UserRequest userRequest) {
         customOAuth2UserService.loadUser(userRequest);
-        OAuth2AccessToken tokenRequest = userRequest.getAccessToken();
+        String tokenRequest = userRequest.getAccessToken().toString();
         String email = customOAuth2UserService.findKakaoUser(tokenRequest);
 
         if (userRepository.findByEmail(email) != null) {
@@ -45,8 +45,8 @@ public class LoginController {
     }
 
     @PostMapping("/signup/first")
-    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto, OAuth2AccessToken tokenRequest) {
-        loginService.signUp(userDto, tokenRequest);
+    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
+        loginService.signUp(userDto);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
