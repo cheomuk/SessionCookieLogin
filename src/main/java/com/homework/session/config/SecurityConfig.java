@@ -2,7 +2,6 @@ package com.homework.session.config;
 
 import com.homework.session.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -10,7 +9,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
