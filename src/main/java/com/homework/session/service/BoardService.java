@@ -2,10 +2,8 @@ package com.homework.session.service;
 
 import com.homework.session.Repository.BoardRepository;
 import com.homework.session.Repository.UserRepository;
-import com.homework.session.config.LoginUser;
 import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.dto.BoardDto.BoardResponseDto;
-import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;

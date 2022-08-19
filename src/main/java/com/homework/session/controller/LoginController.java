@@ -45,8 +45,8 @@ public class LoginController {
     }
 
     @PostMapping("/signup/first")
-    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
-        loginService.signUp(userDto);
+    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto, OAuth2AccessToken tokenRequest) {
+        loginService.signUp(userDto, tokenRequest);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
