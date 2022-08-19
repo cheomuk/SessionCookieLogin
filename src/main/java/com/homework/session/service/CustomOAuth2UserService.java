@@ -11,7 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -60,7 +59,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     public String findKakaoUser(String accessToken) {
 
         String reqURL = "https://kapi.kakao.com/v2/user/me";
-        String token = accessToken.toString();
+        String token = accessToken;
 
         try {
             URL url = new URL(reqURL);
@@ -82,8 +81,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             }
             System.out.println("response body : " + result);
 
-            JsonParser parser = new JsonParser();
-            JsonElement element = parser.parse(result);
+            JsonElement element = JsonParser.parseString(result);
 
             int id = element.getAsJsonObject().get("id").getAsInt();
             boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
@@ -92,14 +90,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
             }
 
-            System.out.println("id : " + id);
-            System.out.println("email : " + email);
-
             br.close();
             return email;
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+
+        return "null";
     }
 }
