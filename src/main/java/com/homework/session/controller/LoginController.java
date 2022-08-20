@@ -21,7 +21,6 @@ import java.util.HashMap;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "localhost:3000")
 public class LoginController {
 
     private final LoginService loginService;
