@@ -56,6 +56,24 @@ public class LoginService {
     }
 
     @Transactional
+    public MultiValueMap<String, Object> checkUser(String token) {
+        String access_token = kakaoAPI.getAccessToken(token);
+        HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
+        MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
+        String email = userInfo.get("email").toString();
+
+        if (userRepository.existsByEmail(email)) {
+            httpSession.setAttribute("user", email);
+            sessionCarrier.add("session", httpSession.getAttribute(email));
+            sessionCarrier.add("message", "이미 가입한 회원입니다.");
+            return sessionCarrier;
+        } else {
+            sessionCarrier.add("message", "처음 방문한 회원입니다.");
+            return sessionCarrier;
+        }
+    }
+
+    @Transactional
     public boolean checkNickname(String nickname) {
         boolean nicknameDuplicate = userRepository.existsByNickname(nickname);
         return !nicknameDuplicate;
