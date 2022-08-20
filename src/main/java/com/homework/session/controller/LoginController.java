@@ -28,17 +28,10 @@ public class LoginController {
     private final HttpSession httpSession;
 
     @PostMapping("/oauth2/authorization/kakao")
-    public ResponseEntity<String> login(OAuth2UserRequest userRequest, @RequestParam("code") String code) {
+    public ResponseEntity<String> login(OAuth2UserRequest userRequest) {
         customOAuth2UserService.loadUser(userRequest);
-        String access_token = kakaoAPI.getAccessToken(code);
-        HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
-        String email = userRepository.findByEmail(userInfo.get("email").toString()).toString();
 
-        if (email != null) {
-            return ResponseEntity.ok(email);
-        } else {
-            return ResponseEntity.ok("등록되지 않은 이메일입니다.");
-        }
+        return ResponseEntity.ok("로그인 성공");
     }
 
     @GetMapping("/logout")
