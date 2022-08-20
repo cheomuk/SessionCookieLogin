@@ -1,8 +1,5 @@
 package com.homework.session.service;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.OAuthAttributes;
 import com.homework.session.dto.UserDto.UserResponseDto;
@@ -18,13 +15,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Collections;
-import java.util.HashMap;
+
 
 @RequiredArgsConstructor
 @Service
