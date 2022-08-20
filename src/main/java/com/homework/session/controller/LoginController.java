@@ -4,12 +4,12 @@ import com.homework.session.Repository.UserRepository;
 import com.homework.session.config.LoginUser;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.service.CustomOAuth2UserService;
+import com.homework.session.service.KakaoAPI;
 import com.homework.session.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,15 +24,17 @@ public class LoginController {
     private final LoginService loginService;
     private final UserRepository userRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final KakaoAPI kakaoAPI;
     private final HttpSession httpSession;
 
     @PostMapping("/oauth2/authorization/kakao")
     public String login(OAuth2UserRequest userRequest) {
         customOAuth2UserService.loadUser(userRequest);
         String tokenRequest = userRequest.getAccessToken().toString();
-        HashMap<String, Object> findEmail = customOAuth2UserService.findKakaoUser(tokenRequest);
+        String access_token = kakaoAPI.getAccessToken(tokenRequest);
+        HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
 
-        if (userRepository.findByEmail(findEmail.get("email").toString()) != null) {
+        if (userRepository.findByEmail(userInfo.get("email").toString()) != null) {
             return "redirect:/main";
         } else {
             return "redirect:/signUp";
