@@ -15,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
+@CrossOrigin(origins = "localhost:3000")
 public class CommentController {
 
     private final CommentService commentService;
