@@ -7,8 +7,11 @@ import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
@@ -22,22 +25,22 @@ public class LoginService {
     private final CustomOAuth2UserService customOAuth2UserService;
 
     @Transactional
-    public String signUp(UserRequestDto userDto) {
+    public ResponseEntity<String> signUp(UserRequestDto userDto) {
         if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        String email = customOAuth2UserService.findKakaoUser(userDto.getToken());
+        HashMap<String, Object> findEmail = customOAuth2UserService.findKakaoUser(userDto.getToken());
 
         User user = User.builder()
                 .nickname(userDto.getNickname())
-                .email(email)
+                .email(findEmail.get("email").toString())
                 .introduction(userDto.getIntroduction())
                 .userRole(userDto.getUserRole())
                 .build();
 
         userRepository.save(user);
-        return "/";
+        return ResponseEntity.ok("회원가입에 성공했습니다.");
     }
 
     @Transactional

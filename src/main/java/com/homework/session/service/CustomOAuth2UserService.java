@@ -1,6 +1,7 @@
 package com.homework.session.service;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.OAuthAttributes;
@@ -23,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 
 @RequiredArgsConstructor
 @Service
@@ -56,10 +58,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return userRepository.save(user);
     }
 
-    public String findKakaoUser(String accessToken) {
+    public HashMap<String, Object> findKakaoUser(String accessToken) {
 
         String reqURL = "https://kapi.kakao.com/v2/user/me";
-        String token = accessToken;
+        HashMap<String, Object> userInfo = new HashMap<>();
 
         try {
             URL url = new URL(reqURL);
@@ -67,7 +69,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
-            conn.setRequestProperty("Authorization", "Bearer " + token);
+            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
 
             int responseCode = conn.getResponseCode();
             System.out.println("responseCode : " + responseCode);
@@ -83,19 +85,16 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
             JsonElement element = JsonParser.parseString(result);
 
-            int id = element.getAsJsonObject().get("id").getAsInt();
-            boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
-            String email = "";
-            if(hasEmail){
-                email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
-            }
+            JsonObject kakao_account = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
 
+            String email = kakao_account.getAsJsonObject().get("email").getAsString();
+
+            userInfo.put("email", email);
             br.close();
-            return email;
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return "null";
+        return userInfo;
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 
 @RestController
 @Slf4j
@@ -29,9 +30,9 @@ public class LoginController {
     public String login(OAuth2UserRequest userRequest) {
         customOAuth2UserService.loadUser(userRequest);
         String tokenRequest = userRequest.getAccessToken().toString();
-        String email = customOAuth2UserService.findKakaoUser(tokenRequest);
+        HashMap<String, Object> findEmail = customOAuth2UserService.findKakaoUser(tokenRequest);
 
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.findByEmail(findEmail.get("email").toString()) != null) {
             return "redirect:/main";
         } else {
             return "redirect:/signUp";
