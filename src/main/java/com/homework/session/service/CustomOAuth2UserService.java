@@ -57,44 +57,4 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         return userRepository.save(user);
     }
-
-    public HashMap<String, Object> findKakaoUser(String accessToken) {
-
-        String reqURL = "https://kapi.kakao.com/v2/user/me";
-        HashMap<String, Object> userInfo = new HashMap<>();
-
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
-
-            int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : " + responseCode);
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line = "";
-            String result = "";
-
-            while ((line = br.readLine()) != null) {
-                result += line;
-            }
-            System.out.println("response body : " + result);
-
-            JsonElement element = JsonParser.parseString(result);
-
-            JsonObject kakao_account = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
-
-            String email = kakao_account.getAsJsonObject().get("email").getAsString();
-
-            userInfo.put("email", email);
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return userInfo;
-    }
 }

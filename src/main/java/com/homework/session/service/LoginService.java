@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -23,6 +24,7 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final KakaoAPI kakaoAPI;
 
     @Transactional
     public ResponseEntity<String> signUp(UserRequestDto userDto) {
@@ -30,11 +32,14 @@ public class LoginService {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        HashMap<String, Object> findEmail = customOAuth2UserService.findKakaoUser(userDto.getToken());
+        String access_Token = kakaoAPI.getAccessToken(userDto.getToken());
+        HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_Token);
+
+        String email = userInfo.get("email").toString();
 
         User user = User.builder()
                 .nickname(userDto.getNickname())
-                .email(findEmail.get("email").toString())
+                .email(email)
                 .introduction(userDto.getIntroduction())
                 .userRole(userDto.getUserRole())
                 .build();
