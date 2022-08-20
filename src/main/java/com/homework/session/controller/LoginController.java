@@ -10,10 +10,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 
 @RestController
 @Slf4j
@@ -27,23 +30,28 @@ public class LoginController {
     private final KakaoAPI kakaoAPI;
     private final HttpSession httpSession;
 
-    @GetMapping("/oauth2/authorization/kakao")
-    public String login(OAuth2UserRequest userRequest) {
-        customOAuth2UserService.loadUser(userRequest);
-        String tokenRequest = userRequest.getAccessToken().toString();
-        String email = kakaoAPI.getUserInfo(tokenRequest).toString();
-
-        if (userRepository.findByEmail(email) == null) {
-            return "redirect:http://www.naver.com";
-        } else {
-            return "redirect:http://www.naver.com";
-        }
-    }
-
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         httpSession.invalidate();
         return ResponseEntity.ok("로그아웃 되었습니다.");
+    }
+
+    @GetMapping("/check/user")
+    public MultiValueMap<String, Object> checkUser(String token) {
+        String access_token = kakaoAPI.getAccessToken(token);
+        HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
+        MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
+        String email = userInfo.get("email").toString();
+
+        if (userRepository.existsByEmail(email)) {
+            httpSession.setAttribute("user", email);
+            sessionCarrier.add("session", httpSession.getAttribute(email));
+            sessionCarrier.add("message", "이미 가입한 회원입니다.");
+            return sessionCarrier;
+        } else {
+            sessionCarrier.add("message", "처음 방문한 회원입니다.");
+            return sessionCarrier;
+        }
     }
 
     @PostMapping("/signup/first")
@@ -55,7 +63,6 @@ public class LoginController {
     public boolean checkNickname(String nickname) {
         return loginService.checkNickname(nickname);
     }
-
 
     @PutMapping("/mypage/update")
     public ResponseEntity<String> myPage(@RequestBody UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
