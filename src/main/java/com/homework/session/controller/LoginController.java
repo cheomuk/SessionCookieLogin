@@ -28,7 +28,7 @@ public class LoginController {
     private final HttpSession httpSession;
 
     @PostMapping("/oauth2/authorization/kakao")
-    public ResponseEntity login(OAuth2UserRequest userRequest, @RequestParam("code") String code) {
+    public ResponseEntity<String> login(OAuth2UserRequest userRequest, @RequestParam("code") String code) {
         customOAuth2UserService.loadUser(userRequest);
         String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
