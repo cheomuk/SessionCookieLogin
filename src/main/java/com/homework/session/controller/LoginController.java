@@ -41,9 +41,8 @@ public class LoginController {
     }
 
     @PostMapping("/signup/first")
-    public ResponseEntity<String> signUp(@RequestBody UserRequestDto userDto) {
-        loginService.signUp(userDto);
-        return ResponseEntity.ok("회원가입이 완료되었습니다.");
+    public ResponseEntity signUp(@RequestBody UserRequestDto userDto) {
+        return ResponseEntity.ok(loginService.signUp(userDto));
     }
 
     @PostMapping("/signup/checkbox")

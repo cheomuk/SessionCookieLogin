@@ -31,7 +31,7 @@ public class KakaoAPI {
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=083d2a31e167e084c9edbde1795a6282");
-            sb.append("&redirect_uri=https://photoshopcommission.shop/oauth2/authorization/kakao");
+            sb.append("&redirect_uri=https://photoshopcommission.shop/signup/first");
             sb.append("&code=" + authorize_code);
             bw.write(sb.toString());
             bw.flush();
