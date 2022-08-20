@@ -27,7 +27,7 @@ public class LoginService {
     @Transactional
     public ResponseEntity<String> signUp(UserRequestDto userDto) {
 
-        String access_token = kakaoAPI.getAccessToken(userDto.getCode());
+        String access_token = kakaoAPI.getAccessToken(userDto.getToken());
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
 
         if (userRepository.existsByEmail(userInfo.get("email").toString())) {

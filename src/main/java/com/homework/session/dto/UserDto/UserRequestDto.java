@@ -19,7 +19,7 @@ public class UserRequestDto {
 
     private String introduction;
     private UserRole userRole;
-    private String code;
+    private String token;
 
     public User toEntity() {
         User user = User.builder()
