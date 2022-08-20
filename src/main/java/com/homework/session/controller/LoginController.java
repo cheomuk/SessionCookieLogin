@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@CrossOrigin(origins = "localhost:3000")
 public class LoginController {
 
     private final LoginService loginService;
@@ -28,10 +28,16 @@ public class LoginController {
     private final HttpSession httpSession;
 
     @GetMapping("/oauth2/authorization/kakao")
-    public ResponseEntity<String> login(OAuth2UserRequest userRequest) {
+    public String login(OAuth2UserRequest userRequest) {
         customOAuth2UserService.loadUser(userRequest);
+        String tokenRequest = userRequest.getAccessToken().toString();
+        String email = kakaoAPI.getUserInfo(tokenRequest).toString();
 
-        return ResponseEntity.ok("로그인 성공");
+        if (userRepository.findByEmail(email) == null) {
+            return "redirect:/signUp";
+        } else {
+            return "redirect:/main";
+        }
     }
 
     @GetMapping("/logout")
