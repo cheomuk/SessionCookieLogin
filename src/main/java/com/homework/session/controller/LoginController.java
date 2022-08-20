@@ -1,10 +1,7 @@
 package com.homework.session.controller;
 
-import com.homework.session.Repository.UserRepository;
 import com.homework.session.config.LoginUser;
 import com.homework.session.dto.UserDto.UserRequestDto;
-import com.homework.session.service.CustomOAuth2UserService;
-import com.homework.session.service.KakaoAPI;
 import com.homework.session.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +19,6 @@ import javax.servlet.http.HttpSession;
 public class LoginController {
 
     private final LoginService loginService;
-    private final UserRepository userRepository;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final KakaoAPI kakaoAPI;
     private final HttpSession httpSession;
 
     @GetMapping("/logout")
@@ -34,8 +28,8 @@ public class LoginController {
     }
 
     @GetMapping("/check/user")
-    public MultiValueMap<String, Object> checkUser(UserRequestDto userDto) {
-        return loginService.checkUser(userDto.getToken());
+    public MultiValueMap<String, Object> checkUser(String token) {
+        return loginService.checkUser(token);
     }
 
     @PostMapping("/signup/first")
