@@ -10,7 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -23,28 +26,33 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final KakaoAPI kakaoAPI;
+    private final HttpSession httpSession;
 
     @Transactional
-    public ResponseEntity<String> signUp(UserRequestDto userDto) {
+    public MultiValueMap<String, Object> signUp(UserRequestDto userDto) {
 
         String access_token = kakaoAPI.getAccessToken(userDto.getToken());
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
+        MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
+        String email = userInfo.get("email").toString();
 
-        if (userRepository.existsByEmail(userInfo.get("email").toString())) {
-            return ResponseEntity.ok("이미 회원가입된 사용자입니다.");
-        }   else if (userRepository.existsByNickname(userDto.getNickname())) {
+        if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
         User user = User.builder()
                 .nickname(userDto.getNickname())
-                .email(userInfo.get("email").toString())
+                .email(email)
                 .introduction(userDto.getIntroduction())
                 .userRole(userDto.getUserRole())
                 .build();
 
+        httpSession.setAttribute("user", email);
+        sessionCarrier.add("session", httpSession.getAttribute(email));
+        sessionCarrier.add("message", "회원가입에 성공했습니다.");
+
         userRepository.save(user);
-        return ResponseEntity.ok("회원가입에 성공했습니다.");
+        return sessionCarrier;
     }
 
     @Transactional
