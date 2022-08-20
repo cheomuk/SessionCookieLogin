@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 @Service
 public class KakaoAPI {
 
+    @Transactional
     public String getAccessToken (String authorize_code) {
         String access_Token = "";
         String refresh_Token = "";
@@ -70,6 +72,7 @@ public class KakaoAPI {
         return access_Token;
     }
 
+    @Transactional
     public HashMap<String, Object> getUserInfo(String accessToken) {
 
         String reqURL = "https://kapi.kakao.com/v2/user/me";
@@ -79,8 +82,7 @@ public class KakaoAPI {
             URL url = new URL(reqURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
+            conn.setRequestMethod("GET");
             conn.setRequestProperty("Authorization", "Bearer " + accessToken);
 
             int responseCode = conn.getResponseCode();
