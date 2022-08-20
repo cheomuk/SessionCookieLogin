@@ -28,10 +28,9 @@ public class LoginController {
     private final HttpSession httpSession;
 
     @PostMapping("/oauth2/authorization/kakao")
-    public String login(OAuth2UserRequest userRequest) {
+    public String login(OAuth2UserRequest userRequest, @RequestParam("code") String code) {
         customOAuth2UserService.loadUser(userRequest);
-        String tokenRequest = userRequest.getAccessToken().toString();
-        String access_token = kakaoAPI.getAccessToken(tokenRequest);
+        String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
 
         if (userRepository.findByEmail(userInfo.get("email").toString()) != null) {
