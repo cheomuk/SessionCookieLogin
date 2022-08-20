@@ -34,9 +34,9 @@ public class LoginController {
         String email = kakaoAPI.getUserInfo(tokenRequest).toString();
 
         if (userRepository.findByEmail(email) == null) {
-            return "redirect:/signUp";
+            return "redirect:http://localhost:3000/signUp";
         } else {
-            return "redirect:/main";
+            return "redirect:http://localhost:3000/main";
         }
     }
 
