@@ -28,8 +28,8 @@ public class LoginController {
     }
 
     @GetMapping("/check/user")
-    public MultiValueMap<String, Object> checkUser(String token) {
-        return loginService.checkUser(token);
+    public MultiValueMap<String, Object> checkUser(UserRequestDto userRequestDto) {
+        return loginService.checkUser(userRequestDto.getToken());
     }
 
     @PostMapping("/signup/first")
