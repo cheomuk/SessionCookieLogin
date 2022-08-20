@@ -34,9 +34,9 @@ public class LoginController {
         String email = kakaoAPI.getUserInfo(tokenRequest).toString();
 
         if (userRepository.findByEmail(email) == null) {
-            return "redirect:http://localhost:3000/signUp";
+            return "redirect:http://www.naver.com";
         } else {
-            return "redirect:http://localhost:3000/main";
+            return "redirect:http://www.naver.com";
         }
     }
 
