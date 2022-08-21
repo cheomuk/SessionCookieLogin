@@ -7,7 +7,6 @@ import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -31,10 +30,10 @@ public class LoginService {
     @Transactional
     public MultiValueMap<String, Object> signUp(UserRequestDto userDto) {
 
-        String access_token = kakaoAPI.getAccessToken(userDto.getToken());
-        HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
+//        String access_token = kakaoAPI.getAccessToken(userDto.getToken());
+//        HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
-        String email = userInfo.get("email").toString();
+//        String email = userInfo.get("email").toString();
 
         if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
@@ -42,13 +41,13 @@ public class LoginService {
 
         User user = User.builder()
                 .nickname(userDto.getNickname())
-                .email(email)
+                .email(userDto.getEmail())
                 .introduction(userDto.getIntroduction())
                 .userRole(userDto.getUserRole())
                 .build();
 
-        httpSession.setAttribute("user", email);
-        sessionCarrier.add("session", httpSession.getAttribute(email));
+        httpSession.setAttribute("user", userDto.getEmail());
+        sessionCarrier.add("session", httpSession.getAttribute(userDto.getEmail()));
         sessionCarrier.add("message", "회원가입에 성공했습니다.");
 
         userRepository.save(user);
