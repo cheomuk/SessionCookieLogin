@@ -55,8 +55,8 @@ public class LoginService {
     }
 
     @Transactional
-    public MultiValueMap<String, Object> checkUser(String token) {
-        String access_token = kakaoAPI.getAccessToken(token);
+    public MultiValueMap<String, Object> checkUser(String code) {
+        String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
         String email = userInfo.get("email").toString();
