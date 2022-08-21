@@ -67,6 +67,7 @@ public class LoginService {
             sessionCarrier.add("message", "이미 가입한 회원입니다.");
             return sessionCarrier;
         } else {
+            sessionCarrier.add("email", email);
             sessionCarrier.add("message", "처음 방문한 회원입니다.");
             return sessionCarrier;
         }
