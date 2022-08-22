@@ -29,7 +29,7 @@ public class LoginController {
     }
 
     @GetMapping("/check/user")
-    public MultiValueMap<String, Object> checkUser(@PathVariable(name = "code") String code) {
+    public MultiValueMap<String, Object> checkUser(@RequestParam String code) {
         return loginService.checkUser(code);
     }
 
