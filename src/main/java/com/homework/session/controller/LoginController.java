@@ -29,8 +29,8 @@ public class LoginController {
     }
 
     @GetMapping("/check/user")
-    public MultiValueMap<String, Object> checkUser(@RequestParam LoginRequestDto loginRequestDto) {
-        return loginService.checkUser(loginRequestDto.getCode());
+    public MultiValueMap<String, Object> checkUser(@PathVariable String code) {
+        return loginService.checkUser(code);
     }
 
     @PostMapping("/signup/first")
