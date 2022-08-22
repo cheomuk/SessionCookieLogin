@@ -30,10 +30,7 @@ public class LoginService {
     @Transactional
     public MultiValueMap<String, Object> signUp(UserRequestDto userDto) {
 
-//        String access_token = kakaoAPI.getAccessToken(userDto.getToken());
-//        HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
-//        String email = userInfo.get("email").toString();
 
         if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
