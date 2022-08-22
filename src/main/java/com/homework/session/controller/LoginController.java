@@ -1,7 +1,6 @@
 package com.homework.session.controller;
 
 import com.homework.session.config.LoginUser;
-import com.homework.session.dto.UserDto.LoginRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.service.LoginService;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +28,13 @@ public class LoginController {
     }
 
     @GetMapping("/check/user")
-    public MultiValueMap<String, Object> checkUser(@RequestParam String code) {
-        return loginService.checkUser(code);
+    public MultiValueMap<String, Object> checkUser(@RequestParam String code, HttpServletRequest request) {
+        return loginService.checkUser(code, request);
     }
 
     @PostMapping("/signup/first")
-    public ResponseEntity signUp(@RequestBody UserRequestDto userDto) {
-        return ResponseEntity.ok(loginService.signUp(userDto));
+    public ResponseEntity signUp(@RequestBody UserRequestDto userDto, HttpServletRequest request) {
+        return ResponseEntity.ok(loginService.signUp(userDto, request));
     }
 
     @PostMapping("/signup/checkbox")

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
@@ -28,7 +29,7 @@ public class LoginService {
     private final HttpSession httpSession;
 
     @Transactional
-    public MultiValueMap<String, Object> signUp(UserRequestDto userDto) {
+    public MultiValueMap<String, Object> signUp(UserRequestDto userDto, HttpServletRequest request) {
 
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
 
@@ -43,8 +44,9 @@ public class LoginService {
                 .userRole(userDto.getUserRole())
                 .build();
 
-        httpSession.setAttribute("user", userDto.getEmail());
-        sessionCarrier.add("session", httpSession.getAttribute(userDto.getEmail()));
+        HttpSession session = request.getSession();
+        session.setAttribute("user", userDto.getEmail());
+        sessionCarrier.add("session", session);
         sessionCarrier.add("message", "회원가입에 성공했습니다.");
 
         userRepository.save(user);
@@ -52,15 +54,16 @@ public class LoginService {
     }
 
     @Transactional
-    public MultiValueMap<String, Object> checkUser(String code) {
+    public MultiValueMap<String, Object> checkUser(String code, HttpServletRequest request) {
         String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
         String email = userInfo.get("email").toString();
 
         if (userRepository.existsByEmail(email)) {
-            httpSession.setAttribute("user", email);
-            sessionCarrier.add("session", httpSession.getAttribute(email));
+            HttpSession session = request.getSession();
+            session.setAttribute("user", email);
+            sessionCarrier.add("session", session);
             sessionCarrier.add("message", "이미 가입한 회원입니다.");
             return sessionCarrier;
         } else {
