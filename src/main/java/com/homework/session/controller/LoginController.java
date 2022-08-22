@@ -1,6 +1,7 @@
 package com.homework.session.controller;
 
 import com.homework.session.config.LoginUser;
+import com.homework.session.dto.UserDto.LoginRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.service.LoginService;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,8 @@ public class LoginController {
     }
 
     @GetMapping("/check/user")
-    public MultiValueMap<String, Object> checkUser(@RequestParam String code) {
-        return loginService.checkUser(code);
+    public MultiValueMap<String, Object> checkUser(LoginRequestDto loginRequestDto) {
+        return loginService.checkUser(loginRequestDto.getCode());
     }
 
     @PostMapping("/signup/first")
