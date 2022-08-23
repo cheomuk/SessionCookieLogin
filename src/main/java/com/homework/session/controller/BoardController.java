@@ -3,6 +3,7 @@ package com.homework.session.controller;
 import com.homework.session.config.LoginUser;
 import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
+import com.homework.session.dto.UserDto.UserResponseDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class BoardController {
 
     @PostMapping("/list/create")
     public ResponseEntity<String> createBoard(@RequestBody BoardRequestDto boardListDto,
-                                              @LoginUser UserRequestDto loginUser) {
+                                              @LoginUser UserResponseDto loginUser) {
         boardService.createBoard(boardListDto, loginUser.getNickname());
         return ResponseEntity.ok("게시글이 등록되었습니다.");
     }

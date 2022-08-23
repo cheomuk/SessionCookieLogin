@@ -10,11 +10,13 @@ import java.io.Serializable;
 public class UserResponseDto implements Serializable {
 
     private String nickname;
+    private String email;
     private String introduction;
     private UserRole userRole;
 
     public UserResponseDto(User user) {
         this.nickname = user.getNickname();
+        this.email = user.getEmail();
         this.introduction = user.getIntroduction();
         this.userRole = user.getUserRole();
     }
