@@ -34,7 +34,7 @@ public class LoginService {
 
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
 
-        if (userRepository.existsByEmail(userDto.getEmail()) || userDto.getEmail() == null) {
+        if (userRepository.existsByEmail(userDto.getEmail()) || userDto.getEmail() == "") {
             throw new UnAuthorizedException("잘못된 접근입니다.", ACCESS_DENIED_EXCEPTION);
         } else if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
