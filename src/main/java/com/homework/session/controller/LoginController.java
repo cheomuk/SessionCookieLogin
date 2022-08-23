@@ -28,7 +28,7 @@ public class LoginController {
     }
 
     @GetMapping("/check/user")
-    public MultiValueMap<String, Object> checkUser(@RequestParam String code, HttpServletRequest request) {
+    public MultiValueMap<String, String> checkUser(@RequestParam String code, HttpServletRequest request) {
         return loginService.checkUser(code, request);
     }
 

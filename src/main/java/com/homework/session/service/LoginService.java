@@ -26,12 +26,11 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final KakaoAPI kakaoAPI;
-    private final HttpSession httpSession;
 
     @Transactional
-    public MultiValueMap<String, Object> signUp(UserRequestDto userDto, HttpServletRequest request) {
+    public MultiValueMap<String, String> signUp(UserRequestDto userDto, HttpServletRequest request) {
 
-        MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> sessionCarrier = new LinkedMultiValueMap<>();
 
         if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
@@ -46,7 +45,7 @@ public class LoginService {
 
         HttpSession session = request.getSession();
         session.setAttribute("user", userDto.getEmail());
-        sessionCarrier.add("session", session);
+        sessionCarrier.add("session", session.toString());
         sessionCarrier.add("message", "회원가입에 성공했습니다.");
 
         userRepository.save(user);
@@ -54,16 +53,16 @@ public class LoginService {
     }
 
     @Transactional
-    public MultiValueMap<String, Object> checkUser(String code, HttpServletRequest request) {
+    public MultiValueMap<String, String> checkUser(String code, HttpServletRequest request) {
         String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
-        MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> sessionCarrier = new LinkedMultiValueMap<>();
         String email = userInfo.get("email").toString();
 
         if (userRepository.existsByEmail(email)) {
             HttpSession session = request.getSession();
             session.setAttribute("user", email);
-            sessionCarrier.add("session", session);
+            sessionCarrier.add("session", session.toString());
             sessionCarrier.add("message", "이미 가입한 회원입니다.");
             return sessionCarrier;
         } else {
