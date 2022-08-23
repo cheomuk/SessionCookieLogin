@@ -3,6 +3,7 @@ package com.homework.session.service;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,12 @@ import java.util.HashMap;
 
 @Service
 public class KakaoAPI {
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String kakaoClientId;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    private String kakaoRedirectUri;
 
     @Transactional
     public String getAccessToken (String authorize_code) {
@@ -32,8 +39,8 @@ public class KakaoAPI {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
-            sb.append("&client_id=083d2a31e167e084c9edbde1795a6282");
-            sb.append("&redirect_uri=http://localhost:3000/callback/kakao");
+            sb.append("&client_id=" + kakaoClientId);
+            sb.append("&redirect_uri=" + kakaoRedirectUri);
             sb.append("&code=" + authorize_code);
             bw.write(sb.toString());
             bw.flush();
