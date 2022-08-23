@@ -28,16 +28,16 @@ public class LoginController {
     }
 
     @GetMapping("/check/user")
-    public MultiValueMap<String, String> checkUser(@RequestParam String code, HttpServletRequest request) {
+    public MultiValueMap<String, Object> checkUser(@RequestParam String code, HttpServletRequest request) {
         return loginService.checkUser(code, request);
     }
 
     @PostMapping("/signup/first")
-    public ResponseEntity signUp(@RequestBody UserRequestDto userDto, HttpServletRequest request) {
-        return ResponseEntity.ok(loginService.signUp(userDto, request));
+    public MultiValueMap<String, Object> signUp(@RequestBody UserRequestDto userDto, HttpServletRequest request) {
+        return loginService.signUp(userDto, request);
     }
 
-    @PostMapping("/signup/checkbox")
+    @GetMapping("/signup/checkbox")
     public boolean checkNickname(String nickname) {
         return loginService.checkNickname(nickname);
     }
