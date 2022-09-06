@@ -1,12 +1,16 @@
 package com.homework.session.service;
 
 import com.homework.session.Repository.BoardRepository;
+import com.homework.session.Repository.FileRepository;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.dto.BoardDto.BoardResponseDto;
+import com.homework.session.dto.FileDto.FileRequestDto;
 import com.homework.session.entity.BoardList;
+import com.homework.session.entity.File;
 import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
+import com.homework.session.service.S3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,6 +18,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
@@ -25,6 +34,8 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final S3UploadService s3UploadService;
+    private final FileRepository fileRepository;
 
     @Transactional
     public Page<BoardList> getTitleBoardList(String keyword, Pageable pageable) {
@@ -57,10 +68,29 @@ public class BoardService {
 
         User user = userRepository.findByNickname(nickname);
         boardListDto.setUser(user);
+
         BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
 
+        uploadBoardListFile(boardListDto, boardList);
+
         return boardList.getId();
+    }
+
+    public List<String> uploadBoardListFile(BoardRequestDto boardListDto, BoardList boardList) {
+        return boardListDto.getFileList().stream()
+                .map(file -> s3UploadService.uploadFile(file))
+                .map(url -> createFile(boardList, url))
+                .map(file -> file.getFileUrl())
+                .collect(Collectors.toList());
+    }
+
+    public File createFile(BoardList boardList, String url) {
+        return fileRepository.save(File.builder()
+                .fileUrl(url)
+                .fileName(StringUtils.getFilename(url))
+                .boardList(boardList)
+                .build());
     }
 
     @Transactional

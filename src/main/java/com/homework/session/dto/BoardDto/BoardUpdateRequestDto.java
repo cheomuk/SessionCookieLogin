@@ -16,7 +16,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardRequestDto {
+public class BoardUpdateRequestDto {
 
     private Long id;
     private String nickname;
@@ -24,7 +24,8 @@ public class BoardRequestDto {
     private BoardEnumCustom questEnum;
     private String context;
     private User user;
-    private List<MultipartFile> fileList = new ArrayList<>();
+    private List<String> saveFileUrl = new ArrayList<>();
+    private List<MultipartFile> file = new ArrayList<>();
 
     public BoardList toEntity() {
         BoardList boardList = BoardList.builder()

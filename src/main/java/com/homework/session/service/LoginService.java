@@ -8,6 +8,7 @@ import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,13 +29,14 @@ public class LoginService {
     private final UserRepository userRepository;
     private final KakaoAPI kakaoAPI;
     private final HttpSession httpSession;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public MultiValueMap<String, Object> signUp(UserRequestDto userDto, HttpServletRequest request) {
 
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
 
-        if (userRepository.existsByEmail(userDto.getEmail()) || userDto.getEmail() == "") {
+        if (userRepository.existsByEmail(userDto.getCBEmail()) || userDto.getCBEmail() == "") {
             throw new UnAuthorizedException("잘못된 접근입니다.", ACCESS_DENIED_EXCEPTION);
         } else if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
@@ -42,7 +44,7 @@ public class LoginService {
 
         User user = User.builder()
                 .nickname(userDto.getNickname())
-                .email(userDto.getEmail())
+                .email(userDto.getCBEmail())
                 .introduction(userDto.getIntroduction())
                 .userRole(userDto.getUserRole())
                 .build();
@@ -61,15 +63,18 @@ public class LoginService {
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
         String email = userInfo.get("email").toString();
+        String BEmail = passwordEncoder.encode(email);
+        String FEmail = userRepository.findByEmail(BEmail).toString();
 
-        if (userRepository.existsByEmail(email)) {
 
-            User user = userRepository.findByEmail(email).orElseThrow(() ->
+        if (passwordEncoder.matches(FEmail, email)) {
+
+            User user = userRepository.findByEmail(BEmail).orElseThrow(() ->
                 { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
             User userDto = User.builder()
                     .nickname(user.getNickname())
-                    .email(user.getEmail())
+                    .email(BEmail)
                     .introduction(user.getIntroduction())
                     .userRole(user.getUserRole())
                     .build();
@@ -79,7 +84,7 @@ public class LoginService {
             sessionCarrier.add("message", "이미 가입한 회원입니다.");
             return sessionCarrier;
         } else {
-            sessionCarrier.add("email", email);
+            sessionCarrier.add("email", BEmail);
             sessionCarrier.add("message", "처음 방문한 회원입니다.");
             return sessionCarrier;
         }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -41,9 +42,12 @@ public class BoardList extends BaseTimeEntity {
     @JoinColumn(name = "board_list")
     private User user;
 
-    @OneToMany(mappedBy = "boardList", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "boardList", orphanRemoval = true)
     @OrderBy("id asc") // 오름차순 정렬
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "boardList", orphanRemoval = true)
+    private List<File> fileList = new ArrayList<>();
 
     public void update(BoardRequestDto boardListDto) {
         this.title = boardListDto.getTitle();
