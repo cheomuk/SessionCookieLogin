@@ -1,6 +1,7 @@
 package com.homework.session.entity;
 
 import com.homework.session.dto.BoardDto.BoardRequestDto;
+import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
 import com.homework.session.enumcustom.BoardEnumCustom;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,5 +54,11 @@ public class BoardList extends BaseTimeEntity {
         this.title = boardListDto.getTitle();
         this.questEnum = boardListDto.getQuestEnum();
         this.context = boardListDto.getContext();
+    }
+
+    public void updateBoardList(BoardUpdateRequestDto boardUpdateRequestDto) {
+        this.title = boardUpdateRequestDto.getTitle();
+        this.questEnum = boardUpdateRequestDto.getQuestEnum();
+        this.context = boardUpdateRequestDto.getContext();
     }
 }

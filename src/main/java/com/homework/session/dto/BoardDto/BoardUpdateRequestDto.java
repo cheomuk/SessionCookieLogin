@@ -24,7 +24,7 @@ public class BoardUpdateRequestDto {
     private BoardEnumCustom questEnum;
     private String context;
     private User user;
-    private List<String> saveFileUrl = new ArrayList<>();
+    private List<String> savedFileUrl = new ArrayList<>();
     private List<MultipartFile> file = new ArrayList<>();
 
     public BoardList toEntity() {
