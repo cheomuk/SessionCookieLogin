@@ -19,7 +19,6 @@ import java.util.List;
 public class BoardUpdateRequestDto {
 
     private Long id;
-    private String nickname;
     private String title;
     private BoardEnumCustom questEnum;
     private String context;
@@ -27,16 +26,4 @@ public class BoardUpdateRequestDto {
     private List<String> savedFileUrl = new ArrayList<>();
     private List<MultipartFile> file = new ArrayList<>();
 
-    public BoardList toEntity() {
-        BoardList boardList = BoardList.builder()
-                .id(id)
-                .nickname(nickname)
-                .title(title)
-                .questEnum(questEnum)
-                .context(context)
-                .user(user)
-                .build();
-
-        return boardList;
-    }
 }
