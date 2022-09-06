@@ -5,3 +5,5 @@
 
 # IntellJ IDEA
 application.yml
+application-real.yml
+application-s3.yml
