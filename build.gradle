@@ -5,6 +5,7 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        maven { url 'https://repo.spring.io/libs-milestone'}
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -44,4 +45,6 @@ dependencies {
     implementation('org.springframework.session:spring-session-jdbc')
     implementation('org.mariadb.jdbc:mariadb-java-client')
     implementation('org.springdoc:springdoc-openapi-ui:1.6.6')
+    implementation('org.springframework.cloud:spring-cloud-starter-aws:2.0.1.RELEASE')
+    implementation('com.amazonaws:aws-java-sdk-s3')
 }

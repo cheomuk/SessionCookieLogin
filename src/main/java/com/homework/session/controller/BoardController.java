@@ -13,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -38,9 +41,8 @@ public class BoardController {
     }
 
     @PostMapping("/list/create")
-    public ResponseEntity<String> createBoard(@RequestBody BoardRequestDto boardListDto,
-                                              @LoginUser UserResponseDto loginUser) {
-        boardService.createBoard(boardListDto, loginUser.getNickname());
+    public ResponseEntity<String> createBoard(BoardRequestDto boardListDto) {
+        boardService.createBoard(boardListDto, boardListDto.getNickname());
         return ResponseEntity.ok("게시글이 등록되었습니다.");
     }
 
