@@ -42,16 +42,14 @@ public class BoardController {
     }
 
     @PostMapping("/list/create")
-    public ResponseEntity<String> createBoard(@RequestBody BoardRequestDto boardListDto,
-                                              @LoginUser  UserResponseDto loginUser) {
-        boardService.createBoard(boardListDto, loginUser.getNickname());
+    public ResponseEntity<String> createBoard(@RequestBody BoardRequestDto boardListDto) {
+        boardService.createBoard(boardListDto);
         return ResponseEntity.ok("게시글이 등록되었습니다.");
     }
 
     @PutMapping("/list/update")
-    public ResponseEntity<String> updateBoard(@RequestBody BoardUpdateRequestDto boardListDto,
-                                              @LoginUser UserResponseDto loginUser) {
-        boardService.updateBoard(boardListDto, loginUser.getNickname());
+    public ResponseEntity<String> updateBoard(@RequestBody BoardUpdateRequestDto boardListDto) {
+        boardService.updateBoard(boardListDto);
         return ResponseEntity.ok("게시글이 수정되었습니다.");
     }
 
