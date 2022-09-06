@@ -39,7 +39,8 @@ public class S3UploadService {
 
     @Transactional
     public String uploadFile(MultipartFile multipartFile) {
-        //getFileExtension(multipartFile.getName());
+
+        validateFileExists(multipartFile);
         String s3FileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
 
         ObjectMetadata objMeta = new ObjectMetadata();
@@ -57,22 +58,10 @@ public class S3UploadService {
 
     // 파일 유효성 검사
     @Transactional
-    private String getFileExtension(String fileName) {
-        if (fileName.length() == 0) {
-            throw new UnAuthorizedException("FILE_UPLOAD_ERROR", ACCESS_DENIED_EXCEPTION);
+    private void validateFileExists(MultipartFile multipartFile) {
+        if (multipartFile.isEmpty()) {
+            throw new UnAuthorizedException("FILE_EMPTY", ACCESS_DENIED_EXCEPTION);
         }
-        ArrayList<String> fileValidate = new ArrayList<>();
-        fileValidate.add(".jpg");
-        fileValidate.add(".jpeg");
-        fileValidate.add(".png");
-        fileValidate.add(".JPG");
-        fileValidate.add(".JPEG");
-        fileValidate.add(".PNG");
-        String idxFileName = fileName.substring(fileName.lastIndexOf("."));
-        if (!fileValidate.contains(idxFileName)) {
-            throw new UnAuthorizedException("FILE_UPLOAD_ERROR", ACCESS_DENIED_EXCEPTION);
-        }
-        return fileName.substring(fileName.lastIndexOf("."));
     }
 
     // 업로드된 파일 Url 가져오기
