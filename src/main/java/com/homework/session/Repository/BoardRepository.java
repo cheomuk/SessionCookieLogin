@@ -4,19 +4,11 @@ import com.homework.session.entity.BoardList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface BoardRepository extends JpaRepository<BoardList, Long> {
     Page<BoardList> findByNickname(String nickname, Pageable pageable);
     Page<BoardList> findByTitle(String title, Pageable pageable);
-
-    @Query("SELECT n FROM BoardList n WHERE n.nickname = ?1")
-    List<BoardList> findMyNickname(String keyword);
-
-    @Query("SELECT t FROM BoardList t WHERE t.title = ?1")
-    List<BoardList> findMyTitle(String keyword);
+    BoardList findByIdAndNickname(Long id, String nickname);
 }
