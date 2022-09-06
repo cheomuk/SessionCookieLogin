@@ -2,6 +2,7 @@ package com.homework.session.controller;
 
 import com.homework.session.config.LoginUser;
 import com.homework.session.dto.BoardDto.BoardRequestDto;
+import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.dto.UserDto.UserResponseDto;
 import com.homework.session.entity.BoardList;
@@ -46,9 +47,9 @@ public class BoardController {
         return ResponseEntity.ok("게시글이 등록되었습니다.");
     }
 
-    @PutMapping("/list/{id}")
-    public ResponseEntity<String> updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto boardListDto) {
-        boardService.updateBoard(id, boardListDto);
+    @PutMapping("/list/update")
+    public ResponseEntity<String> updateBoard(BoardUpdateRequestDto boardListDto) {
+        boardService.updateBoard(boardListDto);
         return ResponseEntity.ok("게시글이 수정되었습니다.");
     }
 

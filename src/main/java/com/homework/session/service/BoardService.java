@@ -1,11 +1,11 @@
 package com.homework.session.service;
 
 import com.homework.session.Repository.BoardRepository;
-import com.homework.session.Repository.FileRepository;
+import com.homework.session.Repository.FileRepository.FileRepository;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.dto.BoardDto.BoardResponseDto;
-import com.homework.session.dto.FileDto.FileRequestDto;
+import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.entity.File;
 import com.homework.session.entity.User;
@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -77,7 +77,7 @@ public class BoardService {
         return boardList.getId();
     }
 
-    public List<String> uploadBoardListFile(BoardRequestDto boardListDto, BoardList boardList) {
+    private List<String> uploadBoardListFile(BoardRequestDto boardListDto, BoardList boardList) {
         return boardListDto.getFileList().stream()
                 .map(file -> s3UploadService.uploadFile(file))
                 .map(url -> createFile(boardList, url))
@@ -85,7 +85,7 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    public File createFile(BoardList boardList, String url) {
+    private File createFile(BoardList boardList, String url) {
         return fileRepository.save(File.builder()
                 .fileUrl(url)
                 .fileName(StringUtils.getFilename(url))
@@ -94,11 +94,32 @@ public class BoardService {
     }
 
     @Transactional
-    public void updateBoard(Long id, BoardRequestDto boardListDto) {
-        BoardList boardList = boardRepository.findById(id)
+    public void updateBoard(BoardUpdateRequestDto boardListDto) {
+        BoardList boardList = boardRepository.findById(boardListDto.getId())
                 .orElseThrow(() -> { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        boardList.update(boardListDto);
+        validateDeletedFiles(boardListDto);
+        uploadFiles(boardListDto, boardList);
+
+        boardList.updateBoardList(boardListDto);
+    }
+
+    private void validateDeletedFiles(BoardUpdateRequestDto boardListDto) {
+        fileRepository.findBySavedFileUrl(boardListDto.getId()).stream()
+                .filter(file -> !boardListDto.getSavedFileUrl().stream().anyMatch(Predicate.isEqual(file.getFileUrl())))
+                .forEach(url -> {
+                    fileRepository.delete(url);
+                    s3UploadService.deleteFile(url.getFileUrl());
+                });
+    }
+
+    private void uploadFiles(BoardUpdateRequestDto boardListDto, BoardList boardList) {
+        boardListDto.getFile()
+                .stream()
+                .forEach(file -> {
+                    String url = s3UploadService.uploadFile(file);
+                    createFile(boardList, url);
+                });
     }
 
     @Transactional

@@ -72,8 +72,8 @@ public class S3UploadService {
 
     // DeleteObject를 통해 S3 파일 삭제
     @Transactional
-    public void deleteFile(String fileName) {
-        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, fileName);
-        s3Client.deleteObject(deleteObjectRequest);
+    public void deleteFile(String fileUrl) {
+        log.info("deleteImage = {}", fileUrl);
+        s3Client.deleteObject(new DeleteObjectRequest(bucket, fileUrl));
     }
 }
