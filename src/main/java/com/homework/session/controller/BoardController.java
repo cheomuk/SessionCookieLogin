@@ -42,13 +42,13 @@ public class BoardController {
     }
 
     @PostMapping("/list/create")
-    public ResponseEntity<String> createBoard(@RequestBody BoardRequestDto boardListDto) {
+    public ResponseEntity<String> createBoard(BoardRequestDto boardListDto) {
         boardService.createBoard(boardListDto);
         return ResponseEntity.ok("게시글이 등록되었습니다.");
     }
 
     @PutMapping("/list/update")
-    public ResponseEntity<String> updateBoard(@RequestBody BoardUpdateRequestDto boardListDto) {
+    public ResponseEntity<String> updateBoard(BoardUpdateRequestDto boardListDto) {
         boardService.updateBoard(boardListDto);
         return ResponseEntity.ok("게시글이 수정되었습니다.");
     }

@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
+import static java.util.function.Predicate.isEqual;
 
 @RequiredArgsConstructor
 @Transactional

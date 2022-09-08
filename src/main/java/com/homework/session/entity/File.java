@@ -25,7 +25,7 @@ public class File {
     private String fileUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(name = "boardList_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private BoardList boardList;
 
