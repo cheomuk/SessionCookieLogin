@@ -65,9 +65,9 @@ public class BoardService {
     }
 
     @Transactional
-    public Long createBoard(BoardRequestDto boardListDto) {
+    public Long createBoard(BoardRequestDto boardListDto, String nickname) {
 
-        User user = userRepository.findByNickname(boardListDto.getNickname());
+        User user = userRepository.findByNickname(nickname);
         boardListDto.setUser(user);
 
         BoardList boardList = boardListDto.toEntity();
@@ -95,10 +95,12 @@ public class BoardService {
     }
 
     @Transactional
-    public void updateBoard(BoardUpdateRequestDto boardListDto) {
+    public void updateBoard(BoardUpdateRequestDto boardListDto, String nickname) {
 
-        BoardList boardList = boardRepository.findById(boardListDto.getId())
-                .orElseThrow(() -> { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+        BoardList boardList = boardRepository.findByIdAndNickname(boardListDto.getId(), nickname);
+        if (boardList == null) {
+            throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
+        }
 
         validateDeletedFiles(boardListDto);
         uploadFiles(boardListDto, boardList);
