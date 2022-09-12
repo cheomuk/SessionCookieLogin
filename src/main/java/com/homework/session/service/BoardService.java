@@ -6,6 +6,7 @@ import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.dto.BoardDto.BoardResponseDto;
 import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
+import com.homework.session.dto.BoardDto.UploadFileResponse;
 import com.homework.session.entity.BoardList;
 import com.homework.session.entity.File;
 import com.homework.session.entity.User;
@@ -19,13 +20,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
-import static java.util.function.Predicate.isEqual;
 
 @RequiredArgsConstructor
 @Transactional
@@ -65,7 +67,7 @@ public class BoardService {
     }
 
     @Transactional
-    public Long createBoard(BoardRequestDto boardListDto, String nickname) {
+    public UploadFileResponse createBoard(BoardRequestDto boardListDto, String nickname) {
 
         User user = userRepository.findByNickname(nickname);
         boardListDto.setUser(user);
@@ -73,9 +75,17 @@ public class BoardService {
         BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
 
-        uploadBoardListFile(boardListDto, boardList);
+        List<String> downloadLink = uploadBoardListFile(boardListDto, boardList);
+        List<String> downloadUri = new ArrayList<>();
 
-        return boardList.getId();
+        for(String Link : downloadLink) {
+            File file = fileRepository.findByFileUrl(Link);
+            downloadUri.add(file.getFileName());
+        }
+
+        UploadFileResponse uploadFileResponse = new UploadFileResponse(boardList.getId(), downloadUri);
+
+        return uploadFileResponse;
     }
 
     private List<String> uploadBoardListFile(BoardRequestDto boardListDto, BoardList boardList) {
@@ -95,9 +105,10 @@ public class BoardService {
     }
 
     @Transactional
-    public void updateBoard(BoardUpdateRequestDto boardListDto, String nickname) {
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, String nickname) {
 
         BoardList boardList = boardRepository.findByIdAndNickname(boardListDto.getId(), nickname);
+
         if (boardList == null) {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
         }
@@ -106,6 +117,16 @@ public class BoardService {
         uploadFiles(boardListDto, boardList);
 
         boardList.updateBoardList(boardListDto);
+
+        List<String> downloadUri = new ArrayList<>();
+
+        for (MultipartFile Link : boardListDto.getFile()) {
+            downloadUri.add(Link.getOriginalFilename());
+        }
+
+        UploadFileResponse uploadFileResponse = new UploadFileResponse(boardListDto.getId(), downloadUri);
+
+        return uploadFileResponse;
     }
 
     private void validateDeletedFiles(BoardUpdateRequestDto boardListDto) {
