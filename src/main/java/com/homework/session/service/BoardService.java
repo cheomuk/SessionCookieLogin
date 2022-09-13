@@ -148,9 +148,12 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteBoard(Long id) {
-        BoardList boardList = boardRepository.findById(id)
-                .orElseThrow(() -> { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+    public void deleteBoard(Long id, String nickname) {
+        BoardList boardList = boardRepository.findByIdAndNickname(id, nickname);
+
+        if (boardList == null) {
+            throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
+        }
 
         boardRepository.delete(boardList);
     }
