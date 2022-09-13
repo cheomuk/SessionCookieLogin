@@ -1,8 +1,1 @@
-# Project exclude paths
-/.gradle/
-/build/
-/build/classes/java/main/
 
-# IntellJ IDEA
-application.yml
-application-s3.yml
