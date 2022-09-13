@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -47,18 +45,20 @@ public class BoardController {
     }
 
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(@RequestBody BoardRequestDto boardListDto) {
-        return boardService.createBoard(boardListDto, boardListDto.getNickname());
+    public UploadFileResponse createBoard(@RequestBody BoardRequestDto boardListDto,
+                                          @LoginUser UserRequestDto loginUser) {
+        return boardService.createBoard(boardListDto, loginUser.getNickname());
     }
 
     @PutMapping("/list/update")
-    public UploadFileResponse updateBoard(@RequestBody BoardUpdateRequestDto boardListDto) {
-        return boardService.updateBoard(boardListDto, boardListDto.getNickname());
+    public UploadFileResponse updateBoard(@RequestBody BoardUpdateRequestDto boardListDto,
+                                          @LoginUser UserRequestDto loginUser) {
+        return boardService.updateBoard(boardListDto, loginUser.getNickname());
     }
 
     @DeleteMapping("/list/{id}")
-    public ResponseEntity<String> deleteBoard(@PathVariable Long id) {
-        boardService.deleteBoard(id);
+    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @LoginUser UserRequestDto loginUser) {
+        boardService.deleteBoard(id, loginUser.getNickname());
         return ResponseEntity.ok("게시글이 삭제되었습니다.");
     }
 
