@@ -8,6 +8,9 @@ import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.service.BoardService;
 import com.homework.session.service.S3.S3DownloadService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -24,44 +28,69 @@ import java.net.URLEncoder;
 @Slf4j
 @RequiredArgsConstructor
 @CrossOrigin(origins = "localhost:3000")
+@Api(tags = {"게시글 Controller"})
 public class BoardController {
 
     private final BoardService boardService;
     private final S3DownloadService s3DownloadService;
 
     @GetMapping("/main")
-    public Page<BoardList> getAllBoardList(@PageableDefault Pageable pageable) {
+    public Page<BoardList> getAllBoardList(@ApiIgnore @PageableDefault Pageable pageable) {
         return boardService.getAllBoardList(pageable);
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "keyword", value = "title 값", required = true,
+                    dataType = "String", paramType = "query")
+    })
     @GetMapping("/filter/title")
-    public Page<BoardList> getTitleBoardList(@RequestParam String keyword, @PageableDefault Pageable pageable) {
+    public Page<BoardList> getTitleBoardList(@RequestParam String keyword, @ApiIgnore @PageableDefault Pageable pageable) {
         return boardService.getTitleBoardList(keyword, pageable);
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "keyword", value = "nickname 값", required = true,
+                    dataType = "String", paramType = "query")
+    })
     @GetMapping("/filter/nickname")
-    public Page<BoardList> getNicknameBoardList(@RequestParam String keyword, @PageableDefault Pageable pageable) {
+    public Page<BoardList> getNicknameBoardList(@RequestParam String keyword, @ApiIgnore @PageableDefault Pageable pageable) {
         return boardService.getNicknameBoardList(keyword, pageable);
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
+                    dataType = "Object", paramType = "query")
+    })
     @PostMapping("/list/create")
     public UploadFileResponse createBoard(@RequestBody BoardRequestDto boardListDto,
-                                          @LoginUser UserRequestDto loginUser) {
+                                          @ApiIgnore @LoginUser UserRequestDto loginUser) {
         return boardService.createBoard(boardListDto, loginUser.getNickname());
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
+                    dataType = "Object", paramType = "query")
+    })
     @PutMapping("/list/update")
     public UploadFileResponse updateBoard(@RequestBody BoardUpdateRequestDto boardListDto,
-                                          @LoginUser UserRequestDto loginUser) {
-        return boardService.updateBoard(boardListDto, loginUser.getNickname());
+                                          @ApiIgnore @LoginUser UserRequestDto loginUser) {
+        return boardService.updateBoard(boardListDto, loginUser.toEntity().getId());
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
+                    dataType = "Object", paramType = "query")
+    })
     @DeleteMapping("/list/{id}")
-    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @LoginUser UserRequestDto loginUser) {
-        boardService.deleteBoard(id, loginUser.getNickname());
+    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @ApiIgnore @LoginUser UserRequestDto loginUser) {
+        boardService.deleteBoard(id, loginUser.toEntity().getId());
         return ResponseEntity.ok("게시글이 삭제되었습니다.");
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "fileName", value = "다운로드 받고 싶은 파일 이름", required = true,
+                    dataType = "String", paramType = "query")
+    })
     @GetMapping("/list/file/download")
     public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam String fileName) {
         try{
