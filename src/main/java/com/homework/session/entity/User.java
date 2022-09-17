@@ -23,7 +23,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false, unique = true)
@@ -33,7 +33,7 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private UserRole userRole;
 
-    @Column
+    @Column(nullable = false)
     private String introduction;
 
     public void update(UserRequestDto userDto) {

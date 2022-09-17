@@ -40,7 +40,7 @@ public class BoardList extends BaseTimeEntity {
     private String context;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_list")
+    @JoinColumn(name = "user")
     private User user;
 
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)

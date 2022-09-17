@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface BoardRepository extends JpaRepository<BoardList, Long> {
     Page<BoardList> findByNickname(String nickname, Pageable pageable);
     Page<BoardList> findByTitle(String title, Pageable pageable);
-    BoardList findByIdAndNickname(Long id, String nickname);
+    BoardList findByIdAndUserId(Long id, Long idx);
 }

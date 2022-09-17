@@ -3,6 +3,7 @@ package com.homework.session.dto.BoardDto;
 import com.homework.session.dto.CommentDto.CommentResponseDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.enumcustom.BoardEnumCustom;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 import java.util.List;

@@ -105,9 +105,9 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, String nickname) {
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, Long id) {
 
-        BoardList boardList = boardRepository.findByIdAndNickname(boardListDto.getId(), nickname);
+        BoardList boardList = boardRepository.findByIdAndUserId(boardListDto.getId(), id);
 
         if (boardList == null) {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
@@ -148,8 +148,8 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteBoard(Long id, String nickname) {
-        BoardList boardList = boardRepository.findByIdAndNickname(id, nickname);
+    public void deleteBoard(Long id, Long idx) {
+        BoardList boardList = boardRepository.findByIdAndUserId(id, idx);
 
         if (boardList == null) {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);

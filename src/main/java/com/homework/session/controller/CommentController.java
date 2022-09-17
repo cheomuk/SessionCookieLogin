@@ -5,10 +5,12 @@ import com.homework.session.dto.CommentDto.CommentRequestDto;
 import com.homework.session.dto.CommentDto.CommentResponseDto;
 import com.homework.session.dto.UserDto.UserResponseDto;
 import com.homework.session.service.CommentService;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -16,13 +18,14 @@ import java.util.List;
 @Slf4j
 @RestController
 @CrossOrigin(origins = "localhost:3000")
+@Api(tags = {"댓글 Controller"})
 public class CommentController {
 
     private final CommentService commentService;
 
     @PostMapping("/list/{id}/comments")
     public ResponseEntity createComment(@RequestBody CommentRequestDto commentRequestDto,
-                                        @LoginUser UserResponseDto userLogin) {
+                                        @ApiIgnore @LoginUser UserResponseDto userLogin) {
         return ResponseEntity.ok(commentService.createComment(commentRequestDto.getId(),
                 userLogin.getNickname(), commentRequestDto));
     }

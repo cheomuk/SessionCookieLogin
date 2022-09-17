@@ -2,6 +2,7 @@ package com.homework.session.dto.UserDto;
 
 import com.homework.session.entity.User;
 import com.homework.session.enumcustom.UserRole;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -10,13 +11,11 @@ import java.io.Serializable;
 public class UserResponseDto implements Serializable {
 
     private String nickname;
-    private String email;
     private String introduction;
     private UserRole userRole;
 
     public UserResponseDto(User user) {
         this.nickname = user.getNickname();
-        this.email = user.getEmail();
         this.introduction = user.getIntroduction();
         this.userRole = user.getUserRole();
     }

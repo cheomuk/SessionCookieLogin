@@ -1,22 +1,22 @@
 package com.homework.session.service;
 
 import com.homework.session.Repository.UserRepository;
-import com.homework.session.config.LoginUser;
+import com.homework.session.dto.UserDto.UserMyPageRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.dto.UserDto.UserResponseDto;
 import com.homework.session.entity.User;
+import com.homework.session.enumcustom.UserRole;
 import com.homework.session.error.exception.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.Random;
 
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
@@ -29,62 +29,71 @@ public class LoginService {
     private final UserRepository userRepository;
     private final KakaoAPI kakaoAPI;
     private final HttpSession httpSession;
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public MultiValueMap<String, Object> signUp(UserRequestDto userDto, HttpServletRequest request) {
+    public MultiValueMap<String, Object> signUp(UserRequestDto userDto) {
 
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
 
-        if (userRepository.existsByEmail(userDto.getCBEmail()) || userDto.getCBEmail() == "") {
-            throw new UnAuthorizedException("잘못된 접근입니다.", ACCESS_DENIED_EXCEPTION);
+        if (!userRepository.existsByNickname(userDto.getSerialCode())) {
+            throw new UnAuthorizedException("식별코드가 일치하지 않습니다.", ACCESS_DENIED_EXCEPTION);
         } else if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        User user = User.builder()
-                .nickname(userDto.getNickname())
-                .email(userDto.getCBEmail())
-                .introduction(userDto.getIntroduction())
-                .userRole(userDto.getUserRole())
-                .build();
+        User user = userRepository.findByNickname(userDto.getSerialCode());
 
+        user.update(userDto);
         httpSession.setAttribute("user", new UserResponseDto(user));
         sessionCarrier.add("session", httpSession.getAttribute("user"));
         sessionCarrier.add("message", "회원가입에 성공했습니다.");
 
-        userRepository.save(user);
         return sessionCarrier;
     }
 
     @Transactional
-    public MultiValueMap<String, Object> checkUser(String code, HttpServletRequest request) {
+    public MultiValueMap<String, Object> checkUser(String code) {
         String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
         String email = userInfo.get("email").toString();
-        String BEmail = passwordEncoder.encode(email);
-        String FEmail = userRepository.findByEmail(BEmail).toString();
 
+        if (userRepository.findByEmail(email) != null) {
 
-        if (passwordEncoder.matches(FEmail, email)) {
-
-            User user = userRepository.findByEmail(BEmail).orElseThrow(() ->
+            User user = userRepository.findByEmail(email).orElseThrow(() ->
                 { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
+            if (user.getIntroduction() == "자기를 소개해주세요.") {
+                userRepository.delete(user);
+                sessionCarrier.add("message", "회원가입이 제대로 되지 않았던 회원입니다.");
+                return sessionCarrier;
+            } else {
+                User userDto = User.builder()
+                        .nickname(user.getNickname())
+                        .email(email)
+                        .introduction(user.getIntroduction())
+                        .userRole(user.getUserRole())
+                        .build();
+
+                httpSession.setAttribute("user", new UserResponseDto(userDto));
+                sessionCarrier.add("session", httpSession.getAttribute("user"));
+                sessionCarrier.add("message", "이미 가입한 회원입니다.");
+                return sessionCarrier;
+            }
+        } else {
+            Random random = new Random();
+            int checkNum = random.nextInt(888888) + 111111;
+            String nickname = "ID" + checkNum;
+
             User userDto = User.builder()
-                    .nickname(user.getNickname())
-                    .email(BEmail)
-                    .introduction(user.getIntroduction())
-                    .userRole(user.getUserRole())
+                    .nickname(nickname)
+                    .email(email)
+                    .introduction("자기를 소개해주세요.")
+                    .userRole(UserRole.USER)
                     .build();
 
-            httpSession.setAttribute("user", new UserResponseDto(userDto));
-            sessionCarrier.add("session", httpSession.getAttribute("user"));
-            sessionCarrier.add("message", "이미 가입한 회원입니다.");
-            return sessionCarrier;
-        } else {
-            sessionCarrier.add("email", BEmail);
+            User user = userRepository.save(userDto);
+            sessionCarrier.add("식별번호", nickname);
             sessionCarrier.add("message", "처음 방문한 회원입니다.");
             return sessionCarrier;
         }
@@ -97,8 +106,8 @@ public class LoginService {
     }
 
     @Transactional
-    public UserRequestDto myPage(UserRequestDto userDto, @LoginUser UserRequestDto loginUser) {
-        if (loginUser == null) {
+    public void updateMyPage(UserMyPageRequestDto userDto, String nickname) {
+        if (nickname == null) {
             throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
         }
 
@@ -108,17 +117,19 @@ public class LoginService {
                 .introduction(userDto.getIntroduction())
                 .build();
 
-        return userRepository.findByNicknameAndUserRoleAndIntroduction(myDto.getNickname(), myDto.getUserRole(),
-                myDto.getIntroduction());
+        myDto.toEntity();
     }
 
     @Transactional
-    public void delete(String nickname, @LoginUser UserRequestDto loginUser) {
-        User user = userRepository.findByEmail(nickname).orElseThrow(() ->
-            { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+    public UserResponseDto viewMyPage(String nickname) {
+        User user = userRepository.findByNickname(nickname);
+        UserResponseDto userResponseDto = new UserResponseDto(user);
+        return userResponseDto;
+    }
 
-        if ( loginUser != null ) {
-            userRepository.delete(user);
-        }
+    @Transactional
+    public void delete(String nickname) {
+        User user = userRepository.findByNickname(nickname);
+        userRepository.delete(user);
     }
 }

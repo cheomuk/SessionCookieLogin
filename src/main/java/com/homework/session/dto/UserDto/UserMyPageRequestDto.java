@@ -3,7 +3,10 @@ package com.homework.session.dto.UserDto;
 import com.homework.session.entity.User;
 import com.homework.session.enumcustom.UserRole;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -12,10 +15,7 @@ import javax.validation.constraints.Pattern;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRequestDto {
-
-    @ApiModelProperty(value="식별번호", example = "ID123456", required = true)
-    private String serialCode;
+public class UserMyPageRequestDto {
 
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "닉네임은 특수문자를 제외한 2~8자리여야 합니다.")
     @NotBlank(message = "닉네임은 필수 입력 값입니다.")
