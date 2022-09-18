@@ -65,7 +65,7 @@ public class LoginService {
 
             if (user.getIntroduction().equals("")) {
                 userRepository.delete(user);
-                sessionCarrier.add("message", "회원가입이 제대로 되지 않았던 회원입니다.");
+                sessionCarrier.add("fail", true);
             } else {
                 User userDto = User.builder()
                         .nickname(user.getNickname())
