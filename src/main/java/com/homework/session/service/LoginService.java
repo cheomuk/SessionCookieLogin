@@ -58,7 +58,7 @@ public class LoginService {
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
         String email = userInfo.get("email").toString();
 
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.existsByEmail(email)) {
 
             User user = userRepository.findByEmail(email).orElseThrow(() ->
                 { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
