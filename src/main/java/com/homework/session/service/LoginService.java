@@ -93,7 +93,7 @@ public class LoginService {
                     .build();
 
             User user = userRepository.save(userDto);
-            sessionCarrier.add("식별번호", nickname);
+            sessionCarrier.add("SerialCode", nickname);
             sessionCarrier.add("message", "처음 방문한 회원입니다.");
             return sessionCarrier;
         }
