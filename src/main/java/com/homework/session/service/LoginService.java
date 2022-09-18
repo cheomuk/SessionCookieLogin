@@ -63,10 +63,9 @@ public class LoginService {
             User user = userRepository.findByEmail(email).orElseThrow(() ->
                 { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-            if (user.getIntroduction() == "") {
+            if (user.getIntroduction().equals("")) {
                 userRepository.delete(user);
                 sessionCarrier.add("message", "회원가입이 제대로 되지 않았던 회원입니다.");
-                return sessionCarrier;
             } else {
                 User userDto = User.builder()
                         .nickname(user.getNickname())
@@ -78,7 +77,6 @@ public class LoginService {
                 httpSession.setAttribute("user", new UserResponseDto(userDto));
                 sessionCarrier.add("session", httpSession.getAttribute("user"));
                 sessionCarrier.add("message", "이미 가입한 회원입니다.");
-                return sessionCarrier;
             }
         } else {
             Random random = new Random();
@@ -95,8 +93,8 @@ public class LoginService {
             User user = userRepository.save(userDto);
             sessionCarrier.add("SerialCode", nickname);
             sessionCarrier.add("message", "처음 방문한 회원입니다.");
-            return sessionCarrier;
         }
+        return sessionCarrier;
     }
 
     @Transactional
