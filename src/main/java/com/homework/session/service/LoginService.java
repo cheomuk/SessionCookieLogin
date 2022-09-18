@@ -63,7 +63,7 @@ public class LoginService {
             User user = userRepository.findByEmail(email).orElseThrow(() ->
                 { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-            if (user.getIntroduction() == "자기를 소개해주세요.") {
+            if (user.getIntroduction() == "") {
                 userRepository.delete(user);
                 sessionCarrier.add("message", "회원가입이 제대로 되지 않았던 회원입니다.");
                 return sessionCarrier;
@@ -88,7 +88,7 @@ public class LoginService {
             User userDto = User.builder()
                     .nickname(nickname)
                     .email(email)
-                    .introduction("자기를 소개해주세요.")
+                    .introduction("")
                     .userRole(UserRole.USER)
                     .build();
 
