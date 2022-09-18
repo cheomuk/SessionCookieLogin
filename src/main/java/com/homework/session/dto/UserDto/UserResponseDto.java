@@ -2,7 +2,6 @@ package com.homework.session.dto.UserDto;
 
 import com.homework.session.entity.User;
 import com.homework.session.enumcustom.UserRole;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 import java.io.Serializable;
