@@ -42,8 +42,9 @@ public class LoginService {
         }
 
         User user = userRepository.findByNickname(userDto.getSerialCode());
-
         user.update(userDto);
+
+        user = userRepository.findByNickname(userDto.getNickname());
         httpSession.setAttribute("user", new UserResponseDto(user));
         sessionCarrier.add("session", httpSession.getAttribute("user"));
         sessionCarrier.add("message", "회원가입에 성공했습니다.");

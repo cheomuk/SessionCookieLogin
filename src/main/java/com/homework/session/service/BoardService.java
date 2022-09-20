@@ -105,11 +105,12 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, Long id) {
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, String nickname) {
 
-        BoardList boardList = boardRepository.findByIdAndUserId(boardListDto.getId(), id);
+        BoardList boardList = boardRepository.findById(boardListDto.getId()).orElseThrow(() ->
+            { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        if (boardList == null) {
+        if (!boardList.getUser().getNickname().equals(nickname)) {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
         }
 
@@ -148,10 +149,11 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteBoard(Long id, Long idx) {
-        BoardList boardList = boardRepository.findByIdAndUserId(id, idx);
+    public void deleteBoard(Long id, String nickname) {
+        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
+            { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        if (boardList == null) {
+        if (!boardList.getUser().getNickname().equals(nickname)) {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
         }
 

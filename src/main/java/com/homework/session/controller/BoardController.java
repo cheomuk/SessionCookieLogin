@@ -5,6 +5,7 @@ import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
 import com.homework.session.dto.BoardDto.UploadFileResponse;
 import com.homework.session.dto.UserDto.UserRequestDto;
+import com.homework.session.dto.UserDto.UserResponseDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.service.BoardService;
 import com.homework.session.service.S3.S3DownloadService;
@@ -63,7 +64,7 @@ public class BoardController {
     })
     @PostMapping("/list/create")
     public UploadFileResponse createBoard(@RequestBody BoardRequestDto boardListDto,
-                                          @ApiIgnore @LoginUser UserRequestDto loginUser) {
+                                          @ApiIgnore @LoginUser UserResponseDto loginUser) {
         return boardService.createBoard(boardListDto, loginUser.getNickname());
     }
 
@@ -74,7 +75,7 @@ public class BoardController {
     @PutMapping("/list/update")
     public UploadFileResponse updateBoard(@RequestBody BoardUpdateRequestDto boardListDto,
                                           @ApiIgnore @LoginUser UserRequestDto loginUser) {
-        return boardService.updateBoard(boardListDto, loginUser.toEntity().getId());
+        return boardService.updateBoard(boardListDto, loginUser.getNickname());
     }
 
     @ApiImplicitParams({
@@ -82,8 +83,8 @@ public class BoardController {
                     dataType = "Object", paramType = "query")
     })
     @DeleteMapping("/list/{id}")
-    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @ApiIgnore @LoginUser UserRequestDto loginUser) {
-        boardService.deleteBoard(id, loginUser.toEntity().getId());
+    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @ApiIgnore @LoginUser UserResponseDto loginUser) {
+        boardService.deleteBoard(id, loginUser.getNickname());
         return ResponseEntity.ok("게시글이 삭제되었습니다.");
     }
 
