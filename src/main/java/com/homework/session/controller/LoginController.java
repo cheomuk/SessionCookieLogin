@@ -65,7 +65,7 @@ public class LoginController {
                     dataType = "Object", paramType = "query")
     })
     @PutMapping("/mypage")
-    public UserResponseDto viewMyPage(@ApiIgnore @LoginUser UserRequestDto loginUser) {
+    public UserResponseDto viewMyPage(@ApiIgnore @LoginUser UserResponseDto loginUser) {
         return loginService.viewMyPage(loginUser.getNickname());
     }
 
@@ -76,7 +76,7 @@ public class LoginController {
     })
     @PutMapping("/mypage/update")
     public ResponseEntity<String> updateMyPage(@RequestBody UserMyPageRequestDto userDto,
-                                               @ApiIgnore @LoginUser UserRequestDto loginUser) {
+                                               @ApiIgnore @LoginUser UserResponseDto loginUser) {
         loginService.updateMyPage(userDto, loginUser.getNickname());
         return ResponseEntity.ok("회원정보가 수정되었습니다.");
     }
@@ -87,7 +87,7 @@ public class LoginController {
                     dataType = "Object", paramType = "query")
     })
     @DeleteMapping("/mypage/delete")
-    public ResponseEntity<String> deleteUser(@ApiIgnore @LoginUser UserRequestDto loginUser) {
+    public ResponseEntity<String> deleteUser(@ApiIgnore @LoginUser UserResponseDto loginUser) {
         loginService.delete(loginUser.getNickname());
         return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
     }
