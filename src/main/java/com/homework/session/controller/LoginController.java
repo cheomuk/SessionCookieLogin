@@ -27,8 +27,12 @@ public class LoginController {
     private final LoginService loginService;
     private final HttpSession httpSession;
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
+                    dataType = "Object", paramType = "query")
+    })
     @GetMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<String> logout(HttpSession httpSession) {
         httpSession.invalidate();
         return ResponseEntity.ok("로그아웃 되었습니다.");
     }
