@@ -46,7 +46,6 @@ public class LoginService {
 
         user = userRepository.findByNickname(userDto.getNickname());
         httpSession.setAttribute("user", new UserResponseDto(user));
-        sessionCarrier.add("session", httpSession.getAttribute("user"));
         sessionCarrier.add("message", "회원가입에 성공했습니다.");
 
         return sessionCarrier;
@@ -76,7 +75,6 @@ public class LoginService {
                         .build();
 
                 httpSession.setAttribute("user", new UserResponseDto(userDto));
-                sessionCarrier.add("session", httpSession.getAttribute("user"));
                 sessionCarrier.add("message", "이미 가입한 회원입니다.");
             }
         } else {
