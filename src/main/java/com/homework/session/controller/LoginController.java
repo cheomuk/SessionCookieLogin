@@ -1,6 +1,7 @@
 package com.homework.session.controller;
 
 import com.homework.session.config.LoginUser;
+import com.homework.session.dto.JwtDto.TokenResponse;
 import com.homework.session.dto.UserDto.UserMyPageRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.dto.UserDto.UserResponseDto;
@@ -11,10 +12,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @RestController
@@ -25,15 +26,15 @@ import javax.servlet.http.HttpSession;
 public class LoginController {
 
     private final LoginService loginService;
-    private final HttpSession httpSession;
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
                     dataType = "Object", paramType = "query")
     })
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpSession httpSession) {
-        httpSession.invalidate();
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.invalidate();
         return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 
@@ -43,13 +44,13 @@ public class LoginController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/check/user")
-    public MultiValueMap<String, Object> checkUser(@RequestParam String code) {
+    public TokenResponse checkUser(@RequestParam String code) {
         return loginService.checkUser(code);
     }
 
 
     @PostMapping("/signup")
-    public MultiValueMap<String, Object> signUp(@RequestBody UserRequestDto userDto) {
+    public TokenResponse signUp(@RequestBody UserRequestDto userDto) {
         return loginService.signUp(userDto);
     }
 

@@ -41,8 +41,4 @@ public class User extends BaseTimeEntity {
         this.userRole = userDto.getUserRole();
         this.introduction = userDto.getIntroduction();
     }
-
-    public String getRoleKey() {
-        return this.userRole.getKey();
-    }
 }

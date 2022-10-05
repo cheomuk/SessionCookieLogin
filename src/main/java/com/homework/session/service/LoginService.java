@@ -1,12 +1,16 @@
 package com.homework.session.service;
 
+import com.homework.session.Repository.AuthRepository;
 import com.homework.session.Repository.UserRepository;
+import com.homework.session.dto.JwtDto.TokenResponse;
 import com.homework.session.dto.UserDto.UserMyPageRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.dto.UserDto.UserResponseDto;
+import com.homework.session.entity.AuthEntity;
 import com.homework.session.entity.User;
 import com.homework.session.enumcustom.UserRole;
 import com.homework.session.error.exception.UnAuthorizedException;
+import com.homework.session.jwt.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -28,12 +31,11 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final KakaoAPI kakaoAPI;
-    private final HttpSession httpSession;
+    private final TokenUtils tokenUtils;
+    private final AuthRepository authRepository;
 
     @Transactional
-    public MultiValueMap<String, Object> signUp(UserRequestDto userDto) {
-
-        MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
+    public TokenResponse signUp(UserRequestDto userDto) {
 
         if (!userRepository.existsByNickname(userDto.getSerialCode())) {
             throw new UnAuthorizedException("식별코드가 일치하지 않습니다.", ACCESS_DENIED_EXCEPTION);
@@ -45,17 +47,21 @@ public class LoginService {
         user.update(userDto);
 
         user = userRepository.findByNickname(userDto.getNickname());
-        httpSession.setAttribute("user", new UserResponseDto(user));
-        sessionCarrier.add("message", "회원가입에 성공했습니다.");
 
-        return sessionCarrier;
+        String accessToken = tokenUtils.generateJwtToken(user);
+        String refreshToken = tokenUtils.saveRefreshToken(user);
+
+        authRepository.save(AuthEntity.builder().user(user).refreshToken(refreshToken).build());
+
+        return TokenResponse.builder().ACCESS_TOKEN(accessToken).REFRESH_TOKEN(refreshToken).build();
     }
 
     @Transactional
-    public MultiValueMap<String, Object> checkUser(String code) {
+    public TokenResponse checkUser(String code) {
         String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
+        TokenResponse tokenResponse = new TokenResponse();
         String email = userInfo.get("email").toString();
 
         if (userRepository.existsByEmail(email)) {
@@ -65,7 +71,6 @@ public class LoginService {
 
             if (user.getIntroduction().equals("")) {
                 userRepository.delete(user);
-                sessionCarrier.add("fail", true);
             } else {
                 User userDto = User.builder()
                         .nickname(user.getNickname())
@@ -74,8 +79,24 @@ public class LoginService {
                         .userRole(user.getUserRole())
                         .build();
 
-                httpSession.setAttribute("user", new UserResponseDto(userDto));
-                sessionCarrier.add("message", "이미 가입한 회원입니다.");
+                AuthEntity authEntity = authRepository.findByUserId(userDto.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Token 이 존재하지 않습니다."));
+
+                String accessToken = "";
+                String refreshToken = authEntity.getRefreshToken();
+
+                if (tokenUtils.isValidRefreshToken(refreshToken)) {
+                    accessToken = tokenUtils.generateJwtToken(authEntity.getUser());
+                    tokenResponse.builder()
+                            .ACCESS_TOKEN(accessToken)
+                            .REFRESH_TOKEN(authEntity.getRefreshToken())
+                            .build();
+                } else {
+                    accessToken = tokenUtils.generateJwtToken(authEntity.getUser());
+                    refreshToken = tokenUtils.saveRefreshToken(user);
+                    authEntity.refreshUpdate(refreshToken);
+                    tokenResponse.builder().ACCESS_TOKEN(accessToken).REFRESH_TOKEN(refreshToken).build();
+                }
             }
         } else {
             Random random = new Random();
@@ -89,11 +110,9 @@ public class LoginService {
                     .userRole(UserRole.USER)
                     .build();
 
-            User user = userRepository.save(userDto);
-            sessionCarrier.add("SerialCode", nickname);
-            sessionCarrier.add("message", "처음 방문한 회원입니다.");
+            userRepository.save(userDto);
         }
-        return sessionCarrier;
+        return tokenResponse;
     }
 
     @Transactional
