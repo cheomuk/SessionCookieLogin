@@ -57,7 +57,7 @@ public class LoginService {
     }
 
     @Transactional
-    public TokenResponse checkUser(String code) {
+    public MultiValueMap<String, Object> checkUser(String code) {
         String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
@@ -91,11 +91,13 @@ public class LoginService {
                             .ACCESS_TOKEN(accessToken)
                             .REFRESH_TOKEN(authEntity.getRefreshToken())
                             .build();
+                    sessionCarrier.add("token", tokenResponse);
                 } else {
                     accessToken = tokenUtils.generateJwtToken(authEntity.getUser());
                     refreshToken = tokenUtils.saveRefreshToken(user);
                     authEntity.refreshUpdate(refreshToken);
                     tokenResponse.builder().ACCESS_TOKEN(accessToken).REFRESH_TOKEN(refreshToken).build();
+                    sessionCarrier.add("token", tokenResponse);
                 }
             }
         } else {
@@ -111,8 +113,9 @@ public class LoginService {
                     .build();
 
             userRepository.save(userDto);
+            sessionCarrier.add("SerialCode", nickname);
         }
-        return tokenResponse;
+        return sessionCarrier;
     }
 
     @Transactional

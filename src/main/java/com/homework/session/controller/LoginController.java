@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -44,7 +45,7 @@ public class LoginController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/check/user")
-    public TokenResponse checkUser(@RequestParam String code) {
+    public MultiValueMap<String, Object> checkUser(@RequestParam String code) {
         return loginService.checkUser(code);
     }
 
