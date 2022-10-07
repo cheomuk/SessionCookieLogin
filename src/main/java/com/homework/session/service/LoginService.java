@@ -1,16 +1,15 @@
 package com.homework.session.service;
 
-import com.homework.session.Repository.AuthRepository;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.JwtDto.TokenResponse;
 import com.homework.session.dto.UserDto.UserMyPageRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.dto.UserDto.UserResponseDto;
-import com.homework.session.entity.AuthEntity;
 import com.homework.session.entity.User;
 import com.homework.session.enumcustom.UserRole;
 import com.homework.session.error.exception.UnAuthorizedException;
-import com.homework.session.jwt.TokenUtils;
+import com.homework.session.jwt.JwtTokenProvider;
+import com.homework.session.service.Jwt.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -31,11 +31,11 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final KakaoAPI kakaoAPI;
-    private final TokenUtils tokenUtils;
-    private final AuthRepository authRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
     @Transactional
-    public TokenResponse signUp(UserRequestDto userDto) {
+    public TokenResponse signUp(UserRequestDto userDto, HttpServletResponse response) {
 
         if (!userRepository.existsByNickname(userDto.getSerialCode())) {
             throw new UnAuthorizedException("식별코드가 일치하지 않습니다.", ACCESS_DENIED_EXCEPTION);
@@ -47,21 +47,28 @@ public class LoginService {
         user.update(userDto);
 
         user = userRepository.findByNickname(userDto.getNickname());
+        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRoles());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRoles());
 
-        String accessToken = tokenUtils.generateJwtToken(user);
-        String refreshToken = tokenUtils.saveRefreshToken(user);
+        jwtTokenProvider.setHeaderAccessToken(response, accessToken);
+        jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
 
-        authRepository.save(AuthEntity.builder().user(user).refreshToken(refreshToken).build());
+        redisService.setValues(refreshToken, user.getEmail());
 
-        return TokenResponse.builder().ACCESS_TOKEN(accessToken).REFRESH_TOKEN(refreshToken).build();
+        TokenResponse tokenResponse = TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        return tokenResponse;
     }
 
     @Transactional
-    public MultiValueMap<String, Object> checkUser(String code) {
+    public MultiValueMap<String, Object> checkUser(String code, HttpServletResponse response) {
         String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
+
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
-        TokenResponse tokenResponse = new TokenResponse();
         String email = userInfo.get("email").toString();
 
         if (userRepository.existsByEmail(email)) {
@@ -72,33 +79,21 @@ public class LoginService {
             if (user.getIntroduction().equals("")) {
                 userRepository.delete(user);
             } else {
-                User userDto = User.builder()
-                        .nickname(user.getNickname())
-                        .email(email)
-                        .introduction(user.getIntroduction())
-                        .userRole(user.getUserRole())
+
+                String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRoles());
+                String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRoles());
+
+                jwtTokenProvider.setHeaderAccessToken(response, accessToken);
+                jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
+
+                redisService.setValues(refreshToken, user.getEmail());
+
+                TokenResponse tokenResponse = TokenResponse.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
                         .build();
 
-                AuthEntity authEntity = authRepository.findByUserId(userDto.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Token 이 존재하지 않습니다."));
-
-                String accessToken = "";
-                String refreshToken = authEntity.getRefreshToken();
-
-                if (tokenUtils.isValidRefreshToken(refreshToken)) {
-                    accessToken = tokenUtils.generateJwtToken(authEntity.getUser());
-                    tokenResponse.builder()
-                            .ACCESS_TOKEN(accessToken)
-                            .REFRESH_TOKEN(authEntity.getRefreshToken())
-                            .build();
-                    sessionCarrier.add("token", tokenResponse);
-                } else {
-                    accessToken = tokenUtils.generateJwtToken(authEntity.getUser());
-                    refreshToken = tokenUtils.saveRefreshToken(user);
-                    authEntity.refreshUpdate(refreshToken);
-                    tokenResponse.builder().ACCESS_TOKEN(accessToken).REFRESH_TOKEN(refreshToken).build();
-                    sessionCarrier.add("token", tokenResponse);
-                }
+                sessionCarrier.add("token", tokenResponse);
             }
         } else {
             Random random = new Random();
@@ -125,30 +120,62 @@ public class LoginService {
     }
 
     @Transactional
-    public void updateMyPage(UserMyPageRequestDto userDto, String nickname) {
-        if (nickname == null) {
-            throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
+    public TokenResponse TestToken(UserRequestDto userRequestDto, HttpServletResponse response) {
+
+        if (userRepository.existsByNickname(userRequestDto.getNickname())) {
+            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        UserRequestDto myDto = UserRequestDto.builder()
-                .nickname(userDto.getNickname())
-                .userRole(userDto.getUserRole())
-                .introduction(userDto.getIntroduction())
+        User user = User.builder()
+                .email("test1111@gmail.com")
+                .introduction(userRequestDto.getIntroduction())
+                .userRole(userRequestDto.getUserRole())
+                .nickname(userRequestDto.getNickname())
                 .build();
 
-        myDto.toEntity();
+        userRepository.save(user);
+
+        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRoles());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRoles());
+
+        jwtTokenProvider.setHeaderAccessToken(response, accessToken);
+        jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
+
+        redisService.setValues(refreshToken, user.getEmail());
+
+        TokenResponse tokenResponse = TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        return tokenResponse;
     }
 
-    @Transactional
-    public UserResponseDto viewMyPage(String nickname) {
-        User user = userRepository.findByNickname(nickname);
-        UserResponseDto userResponseDto = new UserResponseDto(user);
-        return userResponseDto;
-    }
-
-    @Transactional
-    public void delete(String nickname) {
-        User user = userRepository.findByNickname(nickname);
-        userRepository.delete(user);
-    }
+//    @Transactional
+//    public void updateMyPage(UserMyPageRequestDto userDto, String token) {
+//        if (tokenService.getNickname(token).isEmpty()) {
+//            throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
+//        }
+//
+//        UserRequestDto myDto = UserRequestDto.builder()
+//                .nickname(userDto.getNickname())
+//                .userRole(userDto.getUserRole())
+//                .introduction(userDto.getIntroduction())
+//                .build();
+//
+//        myDto.toEntity();
+//    }
+//
+//    @Transactional
+//    public UserResponseDto viewMyPage(String token) {
+//        User user = userRepository.findByNickname(tokenService.getNickname(token));
+//        UserResponseDto userResponseDto = new UserResponseDto(user);
+//        return userResponseDto;
+//    }
+//
+//    @Transactional
+//    public void delete(String token) {
+//        User user = userRepository.findByNickname(tokenService.getNickname(token));
+//        userRepository.delete(user);
+//    }
 }
