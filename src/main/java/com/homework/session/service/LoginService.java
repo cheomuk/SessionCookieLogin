@@ -126,8 +126,12 @@ public class LoginService {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
+        System.out.println(userRequestDto.getNickname());
+        System.out.println(userRequestDto.getUserRole());
+        System.out.println(userRequestDto.getIntroduction());
+
         User user = User.builder()
-                .email("test2222@gmail.com")
+                .email("test3334@gmail.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())

@@ -71,7 +71,7 @@ public class LoginController {
     }
 
     @PostMapping("/test/token")
-    public TokenResponse testToken(UserRequestDto userRequestDto, HttpServletResponse response) {
+    public TokenResponse testToken(@RequestBody UserRequestDto userRequestDto, HttpServletResponse response) {
         return loginService.TestToken(userRequestDto, response);
     }
 
