@@ -14,23 +14,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    public static final String ALLOWED_METHOD_NAMES = "GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS,PATCH";
 
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedOrigins("http://localhost:3000")
                 .exposedHeaders("Authorization", "RefreshToken") // 'authorization' 헤더 값을 받아온다
                 .allowedHeaders("*")
-                .allowedMethods(
-                        HttpMethod.GET.name(),
-                        HttpMethod.POST.name(),
-                        HttpMethod.DELETE.name(),
-                        HttpMethod.PUT.name(),
-                        HttpMethod.OPTIONS.name()
-                )
-                .exposedHeaders(HttpHeaders.LOCATION)
+                .allowedMethods("*")
                 .allowCredentials(true);
     }
 }
