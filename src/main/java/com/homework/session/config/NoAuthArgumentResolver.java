@@ -24,7 +24,7 @@ public class NoAuthArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public Authentication resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
                                           final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
-        String accessToken = webRequest.getHeader("Authorization").split("Bearer ")[1];
+        String accessToken = webRequest.getHeader("authorization").split("Bearer ")[1];
         return jwtTokenProvider.getAuthentication(accessToken);
     }
 }
