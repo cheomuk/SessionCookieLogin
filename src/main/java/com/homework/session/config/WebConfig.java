@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedOrigins("http://localhost:3000")
-                .exposedHeaders("authorization", "refreshToken") // 'authorization' 헤더 값을 받아온다
+                .exposedHeaders("Authorization", "RefreshToken") // 'authorization' 헤더 값을 받아온다
                 .allowedHeaders("*")
                 .allowedMethods(
                         HttpMethod.GET.name(),
