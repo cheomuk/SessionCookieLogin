@@ -10,6 +10,7 @@ plugins {
     id 'java'
 }
 
+ext["h2.version"] = "1.4.199"
 apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 configurations {
@@ -50,11 +51,11 @@ dependencies {
     implementation('org.springframework.session:spring-session-jdbc')
     implementation('org.mariadb.jdbc:mariadb-java-client')
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
-    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    implementation("io.lettuce:lettuce-core:6.1.8.RELEASE")
+    implementation('io.lettuce:lettuce-core:6.2.0.RELEASE')
     implementation group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.5.0.RELEASE'
     implementation group: 'org.springframework.data', name: 'spring-data-redis', version: '2.7.3'
     implementation('org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE')
