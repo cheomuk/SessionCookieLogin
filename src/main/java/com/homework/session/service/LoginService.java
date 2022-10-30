@@ -114,15 +114,11 @@ public class LoginService {
     }
 
     @Transactional
-    public TokenResponse TestToken(UserRequestDto userRequestDto, HttpServletResponse response) {
+    public TokenResponse createToken(UserRequestDto userRequestDto, HttpServletResponse response) {
 
         if (userRepository.existsByNickname(userRequestDto.getNickname())) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
-
-        System.out.println(userRequestDto.getNickname());
-        System.out.println(userRequestDto.getUserRole());
-        System.out.println(userRequestDto.getIntroduction());
 
         User user = User.builder()
                 .email("test3336@gmail.com")
@@ -147,6 +143,20 @@ public class LoginService {
                 .build();
 
         return tokenResponse;
+    }
+
+    @Transactional
+    public String resolverToken(String email, UserMyPageRequestDto requestDto) {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
+        User updateUser = User.builder()
+                .nickname(requestDto.getNickname())
+                .userRole(requestDto.getUserRole())
+                .introduction(requestDto.getIntroduction())
+                .build();
+
+        return "내 정보 업데이트 완료";
     }
 
 //    @Transactional
