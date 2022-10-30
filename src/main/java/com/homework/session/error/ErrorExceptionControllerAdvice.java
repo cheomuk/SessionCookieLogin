@@ -4,6 +4,7 @@ import com.homework.session.error.exception.BadRequestException;
 import com.homework.session.error.exception.InternerServerException;
 import com.homework.session.error.exception.NotFoundException;
 import com.homework.session.error.exception.UnAuthorizedException;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

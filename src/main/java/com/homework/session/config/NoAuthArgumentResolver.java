@@ -1,8 +1,8 @@
 package com.homework.session.config;
 
 import com.homework.session.jwt.JwtTokenProvider;
+import io.jsonwebtoken.JwtException;
 import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -22,9 +22,21 @@ public class NoAuthArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Authentication resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                          final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
+    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
+                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
+
         String accessToken = webRequest.getHeader("authorization").split("Bearer ")[1];
-        return jwtTokenProvider.getAuthentication(accessToken);
+        String refreshToken = webRequest.getHeader("refreshToken").split("Bearer")[1];
+
+        if (!jwtTokenProvider.validateToken(accessToken)) {
+            if (jwtTokenProvider.existsRefreshToken(refreshToken)) {
+                String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
+                return newAccessToken;
+            } else {
+                throw new JwtException("만료된 토큰입니다.");
+            }
+        }
+
+        return jwtTokenProvider.getUserEmail(accessToken);
     }
 }
