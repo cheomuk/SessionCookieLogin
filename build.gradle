@@ -19,10 +19,6 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 group 'com.ch.board'
 version '1.0-SNAPSHOT'
 sourceCompatibility = 11
@@ -30,6 +26,7 @@ sourceCompatibility = 11
 repositories {
     mavenCentral()
 }
+
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.projectlombok:lombok')
@@ -40,7 +37,7 @@ dependencies {
     implementation('com.h2database:h2')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     implementation('com.fasterxml.jackson.core:jackson-databind')
-    implementation('com.google.code.gson:gson:2.9.0')
+    implementation('com.google.code.gson:gson:2.10')
     implementation('org.slf4j:jcl-over-slf4j')
     implementation('ch.qos.logback:logback-classic')
     implementation('org.springframework.boot:spring-boot-starter-security')
@@ -55,7 +52,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    implementation('io.lettuce:lettuce-core:6.2.0.RELEASE')
+    implementation('io.lettuce:lettuce-core:6.2.1.RELEASE')
     implementation group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.5.0.RELEASE'
     implementation group: 'org.springframework.data', name: 'spring-data-redis', version: '2.7.3'
     implementation('org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE')

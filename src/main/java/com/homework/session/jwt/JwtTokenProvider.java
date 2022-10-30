@@ -1,6 +1,9 @@
 package com.homework.session.jwt;
 
 import com.homework.session.Repository.UserRepository;
+import com.homework.session.entity.User;
+import com.homework.session.error.ErrorCode;
+import com.homework.session.error.exception.ForbiddenException;
 import com.homework.session.service.Jwt.CustomUserDetailService;
 import com.homework.session.service.Jwt.RedisService;
 import io.jsonwebtoken.*;
@@ -42,7 +45,7 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성.
-    public String createAccessToken(String email, List<String> roles){
+    public String createAccessToken(String email, List<String> roles) {
         return this.createToken(email, roles, accessTokenValidTime);
     }
     // Refresh Token 생성.
@@ -75,16 +78,28 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    // Request의 Header에서 AccessToken 값을 가져옵니다. "authorization" : "token'
+    public String reissueAccessToken(String refreshToken) {
+        String email = redisService.getValues(refreshToken);
+        if (Objects.isNull(email)) {
+            throw new ForbiddenException("E0003", ErrorCode.FORBIDDEN_EXCEPTION);
+        }
+
+        List<String> roles = userRepository.findByEmail(email).get().getRoles();
+        String accessToken = createAccessToken(email, roles);
+
+        return accessToken;
+    }
+
+    // Request의 Header에서 AccessToken 값을 가져옵니다. "authorization" : "token"
     public String resolveAccessToken(HttpServletRequest request) {
-        if(request.getHeader("Authorization") != null )
-            return request.getHeader("Authorization").substring(7);
+        if(request.getHeader("authorization") != null )
+            return request.getHeader("authorization").substring(7);
         return null;
     }
-    // Request의 Header에서 RefreshToken 값을 가져옵니다. "authorization" : "token'
+    // Request의 Header에서 RefreshToken 값을 가져옵니다. "authorization" : "token"
     public String resolveRefreshToken(HttpServletRequest request) {
-        if(request.getHeader("RefreshToken") != null )
-            return request.getHeader("RefreshToken").substring(7);
+        if(request.getHeader("refreshToken") != null )
+            return request.getHeader("refreshToken").substring(7);
         return null;
     }
 
@@ -101,12 +116,12 @@ public class JwtTokenProvider {
 
     // 어세스 토큰 헤더 설정
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
-        response.setHeader("Authorization", "bearer "+ accessToken);
+        response.setHeader("authorization", "bearer "+ accessToken);
     }
 
     // 리프레시 토큰 헤더 설정
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
-        response.setHeader("RefreshToken", "bearer "+ refreshToken);
+        response.setHeader("refreshToken", "bearer "+ refreshToken);
     }
 
     // RefreshToken 존재유무 확인

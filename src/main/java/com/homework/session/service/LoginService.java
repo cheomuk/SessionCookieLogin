@@ -35,13 +35,15 @@ public class LoginService {
     private final RedisService redisService;
 
     @Transactional
-    public TokenResponse signUp(UserRequestDto userDto, HttpServletResponse response) {
+    public MultiValueMap<String, Object> signUp(UserRequestDto userDto, HttpServletResponse response) {
 
         if (!userRepository.existsByNickname(userDto.getSerialCode())) {
             throw new UnAuthorizedException("식별코드가 일치하지 않습니다.", ACCESS_DENIED_EXCEPTION);
         } else if (userRepository.existsByNickname(userDto.getNickname())) {
             throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
         }
+
+        MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
 
         User user = userRepository.findByNickname(userDto.getSerialCode());
         user.update(userDto);
@@ -54,13 +56,9 @@ public class LoginService {
         jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
 
         redisService.setValues(refreshToken, user.getEmail());
+        sessionCarrier.add("message", "회원가입 성공");
 
-        TokenResponse tokenResponse = TokenResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-
-        return tokenResponse;
+        return sessionCarrier;
     }
 
     @Transactional
@@ -78,6 +76,7 @@ public class LoginService {
 
             if (user.getIntroduction().equals("")) {
                 userRepository.delete(user);
+                sessionCarrier.add("fail", true);
             } else {
 
                 String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRoles());
@@ -88,12 +87,7 @@ public class LoginService {
 
                 redisService.setValues(refreshToken, user.getEmail());
 
-                TokenResponse tokenResponse = TokenResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
-
-                sessionCarrier.add("token", tokenResponse);
+                sessionCarrier.add("message", "로그인 성공");
             }
         } else {
             Random random = new Random();
