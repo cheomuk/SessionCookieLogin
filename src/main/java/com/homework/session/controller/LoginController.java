@@ -70,41 +70,46 @@ public class LoginController {
         return loginService.checkNickname(nickname);
     }
 
-    @PostMapping("/test/token")
-    public TokenResponse testToken(@RequestBody UserRequestDto userRequestDto, HttpServletResponse response) {
-        return loginService.TestToken(userRequestDto, response);
+    @PostMapping("/create/token")
+    public TokenResponse createToken(@RequestBody UserRequestDto userRequestDto, HttpServletResponse response) {
+        return loginService.createToken(userRequestDto, response);
+    }
+
+    @PostMapping("/resolver/token")
+    public String resolverToken(@NoAuth String email, @RequestBody UserMyPageRequestDto requestDto) {
+        return loginService.resolverToken(email, requestDto);
     }
 
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-                    dataType = "Object", paramType = "query")
-    })
-    @PutMapping("/mypage")
-    public UserResponseDto viewMyPage(@ApiIgnore @NoAuth TokenResponse tokenResponse) {
-        return loginService.viewMyPage(tokenResponse.getAccessToken());
-    }
-
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-                    dataType = "Object", paramType = "query")
-    })
-    @PutMapping("/mypage/update")
-    public ResponseEntity<String> updateMyPage(@RequestBody UserMyPageRequestDto userDto,
-                                               @ApiIgnore @NoAuth TokenResponse tokenResponse) {
-        loginService.updateMyPage(userDto, tokenResponse.getAccessToken());
-        return ResponseEntity.ok("회원정보가 수정되었습니다.");
-    }
-
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-                    dataType = "Object", paramType = "query")
-    })
-    @DeleteMapping("/mypage/delete")
-    public ResponseEntity<String> deleteUser(@NoAuth TokenResponse tokenResponse) {
-        loginService.delete(tokenResponse.getAccessToken());
-        return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
-    }
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
+//                    dataType = "Object", paramType = "query")
+//    })
+//    @PutMapping("/mypage")
+//    public UserResponseDto viewMyPage(@ApiIgnore @NoAuth TokenResponse tokenResponse) {
+//        return loginService.viewMyPage(tokenResponse.getAccessToken());
+//    }
+//
+//
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
+//                    dataType = "Object", paramType = "query")
+//    })
+//    @PutMapping("/mypage/update")
+//    public ResponseEntity<String> updateMyPage(@RequestBody UserMyPageRequestDto userDto,
+//                                               @ApiIgnore @NoAuth TokenResponse tokenResponse) {
+//        loginService.updateMyPage(userDto, tokenResponse.getAccessToken());
+//        return ResponseEntity.ok("회원정보가 수정되었습니다.");
+//    }
+//
+//
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
+//                    dataType = "Object", paramType = "query")
+//    })
+//    @DeleteMapping("/mypage/delete")
+//    public ResponseEntity<String> deleteUser(@NoAuth TokenResponse tokenResponse) {
+//        loginService.delete(tokenResponse.getAccessToken());
+//        return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
+//    }
 }
