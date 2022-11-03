@@ -1,5 +1,6 @@
 package com.homework.session.error;
 
+import io.jsonwebtoken.JwtException;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;

@@ -1,5 +1,6 @@
 package com.homework.session.config;
 
+import com.homework.session.dto.JwtDto.TokenResponse;
 import com.homework.session.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
 import org.springframework.core.MethodParameter;
@@ -28,15 +29,11 @@ public class NoAuthArgumentResolver implements HandlerMethodArgumentResolver {
         String accessToken = webRequest.getHeader("authorization").split("Bearer ")[1];
         String refreshToken = webRequest.getHeader("refreshToken").split("Bearer")[1];
 
-        if (!jwtTokenProvider.validateToken(accessToken)) {
-            if (jwtTokenProvider.existsRefreshToken(refreshToken)) {
-                String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
-                return newAccessToken;
-            } else {
-                throw new JwtException("만료된 토큰입니다.");
-            }
-        }
+        TokenResponse tokenResponse = TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
 
-        return jwtTokenProvider.getUserEmail(accessToken);
+        return tokenResponse;
     }
 }
