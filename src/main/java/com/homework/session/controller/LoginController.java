@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -76,8 +77,9 @@ public class LoginController {
     }
 
     @PostMapping("/resolver/token")
-    public String resolverToken(@NoAuth String email, @RequestBody UserMyPageRequestDto requestDto) {
-        return loginService.resolverToken(email, requestDto);
+    public String resolverToken(@RequestBody UserMyPageRequestDto requestDto,
+                                HttpServletRequest request, HttpServletResponse response) {
+        return loginService.resolverToken(requestDto, request, response);
     }
 
 

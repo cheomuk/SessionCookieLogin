@@ -10,6 +10,7 @@ import com.homework.session.enumcustom.UserRole;
 import com.homework.session.error.exception.UnAuthorizedException;
 import com.homework.session.jwt.JwtTokenProvider;
 import com.homework.session.service.Jwt.RedisService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Random;
@@ -121,7 +123,7 @@ public class LoginService {
         }
 
         User user = User.builder()
-                .email("test3336@gmail.com")
+                .email("evan05@gmail.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())
@@ -146,16 +148,24 @@ public class LoginService {
     }
 
     @Transactional
-    public String resolverToken(String email, UserMyPageRequestDto requestDto) {
+    public String resolverToken(UserMyPageRequestDto requestDto,
+                                HttpServletRequest request, HttpServletResponse response) {
+
+        String authorization = jwtTokenProvider.resolveAccessToken(request);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+
+        String email = jwtTokenProvider.getUserEmail(refreshToken);
+
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        User updateUser = User.builder()
+        UserRequestDto updateUser = UserRequestDto.builder()
                 .nickname(requestDto.getNickname())
                 .userRole(requestDto.getUserRole())
                 .introduction(requestDto.getIntroduction())
                 .build();
 
+        user.update(updateUser);
         return "내 정보 업데이트 완료";
     }
 
