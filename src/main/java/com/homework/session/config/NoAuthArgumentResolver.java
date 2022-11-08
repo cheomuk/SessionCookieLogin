@@ -1,39 +1,34 @@
 package com.homework.session.config;
 
-import com.homework.session.dto.JwtDto.TokenResponse;
 import com.homework.session.jwt.JwtTokenProvider;
-import io.jsonwebtoken.JwtException;
 import org.springframework.core.MethodParameter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import javax.servlet.http.HttpServletRequest;
+
+@Component
 public class NoAuthArgumentResolver implements HandlerMethodArgumentResolver {
-    private final JwtTokenProvider jwtTokenProvider;
 
-    public NoAuthArgumentResolver(final JwtTokenProvider jwtTokenProvide) {
-        this.jwtTokenProvider = jwtTokenProvide;
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+        return parameter.hasParameterAnnotation(NoAuth.class);
     }
 
     @Override
-    public boolean supportsParameter(final MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(NoAuth.class)
-                && parameter.getParameterType().equals(Long.class);
-    }
-
-    @Override
-    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
+    public String resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
                                   final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
 
-        String accessToken = webRequest.getHeader("authorization").split("Bearer ")[1];
-        String refreshToken = webRequest.getHeader("refreshToken").split("Bearer")[1];
+        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+        String accessToken = request.getHeader("authorization").split("bearer ")[1].substring(7);
 
-        TokenResponse tokenResponse = TokenResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+//        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
-        return tokenResponse;
+        return accessToken;
     }
 }

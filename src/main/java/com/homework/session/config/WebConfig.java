@@ -13,11 +13,11 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final NoAuthArgumentResolver noAuthArgumentResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new NoAuthArgumentResolver(jwtTokenProvider));
+        resolvers.add(noAuthArgumentResolver);
     }
 
     @Override
