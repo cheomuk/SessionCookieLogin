@@ -1,5 +1,6 @@
 package com.homework.session.jwt;
 
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,6 +51,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     /// 컨텍스트에 넣기
                     this.setAuthentication(newAccessToken);
                 }
+            }
+            else {
+                throw new JwtException("다시 로그인 해주세요.");
             }
         }
         filterChain.doFilter(request, response);

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -96,7 +97,7 @@ public class JwtTokenProvider {
             return request.getHeader("authorization").substring(7);
         return null;
     }
-    // Request의 Header에서 RefreshToken 값을 가져옵니다. "authorization" : "token"
+    // Request의 Header에서 RefreshToken 값을 가져옵니다. "refreshToken" : "token"
     public String resolveRefreshToken(HttpServletRequest request) {
         if(request.getHeader("refreshToken") != null )
             return request.getHeader("refreshToken").substring(7);

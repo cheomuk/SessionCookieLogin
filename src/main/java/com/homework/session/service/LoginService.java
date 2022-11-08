@@ -123,7 +123,7 @@ public class LoginService {
         }
 
         User user = User.builder()
-                .email("evan05@gmail.com")
+                .email("evan15@gmail.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())
@@ -154,7 +154,14 @@ public class LoginService {
         String authorization = jwtTokenProvider.resolveAccessToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
+        System.out.println(authorization);
+        System.out.println(refreshToken);
+
+        boolean a = jwtTokenProvider.validateToken(authorization);
+        System.out.println(a);
+
         String email = jwtTokenProvider.getUserEmail(refreshToken);
+        System.out.println(email);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
