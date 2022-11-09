@@ -51,6 +51,7 @@ public class LoginService {
         user.update(userDto);
 
         user = userRepository.findByNickname(userDto.getNickname());
+
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRoles());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRoles());
 
@@ -176,31 +177,41 @@ public class LoginService {
         return "내 정보 업데이트 완료";
     }
 
-//    @Transactional
-//    public void updateMyPage(UserMyPageRequestDto userDto, String token) {
-//        if (tokenService.getNickname(token).isEmpty()) {
-//            throw new UnAuthorizedException("로그인이 필요합니다.", ACCESS_DENIED_EXCEPTION);
-//        }
-//
-//        UserRequestDto myDto = UserRequestDto.builder()
-//                .nickname(userDto.getNickname())
-//                .userRole(userDto.getUserRole())
-//                .introduction(userDto.getIntroduction())
-//                .build();
-//
-//        myDto.toEntity();
-//    }
-//
-//    @Transactional
-//    public UserResponseDto viewMyPage(String token) {
-//        User user = userRepository.findByNickname(tokenService.getNickname(token));
-//        UserResponseDto userResponseDto = new UserResponseDto(user);
-//        return userResponseDto;
-//    }
-//
-//    @Transactional
-//    public void delete(String token) {
-//        User user = userRepository.findByNickname(tokenService.getNickname(token));
-//        userRepository.delete(user);
-//    }
+    @Transactional
+    public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request) {    // 내 정보 업데이트
+        if (!jwtTokenProvider.validateToken(jwtTokenProvider.resolveAccessToken(request))) {
+            throw new JwtException("새로고침 필요!");
+        }
+
+        UserRequestDto myDto = UserRequestDto.builder()
+                .nickname(userDto.getNickname())
+                .userRole(userDto.getUserRole())
+                .introduction(userDto.getIntroduction())
+                .build();
+
+        myDto.toEntity();
+    }
+
+    @Transactional
+    public UserResponseDto viewMyPage(HttpServletRequest request) {     // 내 정보 보기
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        String email = jwtTokenProvider.getUserEmail(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
+        UserResponseDto userResponseDto = new UserResponseDto(user);
+        return userResponseDto;
+    }
+
+    @Transactional
+    public void delete(HttpServletRequest request) {    // 회원 탈퇴
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        String email = jwtTokenProvider.getUserEmail(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
+        userRepository.delete(user);
+    }
 }

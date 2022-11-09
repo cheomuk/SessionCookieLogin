@@ -1,11 +1,9 @@
 package com.homework.session.controller;
 
-import com.homework.session.config.NoAuth;
 import com.homework.session.dto.JwtDto.TokenResponse;
 import com.homework.session.dto.UserDto.UserMyPageRequestDto;
 import com.homework.session.dto.UserDto.UserRequestDto;
 import com.homework.session.dto.UserDto.UserResponseDto;
-import com.homework.session.jwt.JwtTokenProvider;
 import com.homework.session.service.LoginService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -13,10 +11,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -32,7 +27,6 @@ import javax.servlet.http.HttpSession;
 public class LoginController {
 
     private final LoginService loginService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
@@ -83,35 +77,27 @@ public class LoginController {
     }
 
 
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-//                    dataType = "Object", paramType = "query")
-//    })
-//    @PutMapping("/mypage")
-//    public UserResponseDto viewMyPage(@ApiIgnore @NoAuth TokenResponse tokenResponse) {
-//        return loginService.viewMyPage(tokenResponse.getAccessToken());
-//    }
-//
-//
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-//                    dataType = "Object", paramType = "query")
-//    })
-//    @PutMapping("/mypage/update")
-//    public ResponseEntity<String> updateMyPage(@RequestBody UserMyPageRequestDto userDto,
-//                                               @ApiIgnore @NoAuth TokenResponse tokenResponse) {
-//        loginService.updateMyPage(userDto, tokenResponse.getAccessToken());
-//        return ResponseEntity.ok("회원정보가 수정되었습니다.");
-//    }
-//
-//
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-//                    dataType = "Object", paramType = "query")
-//    })
-//    @DeleteMapping("/mypage/delete")
-//    public ResponseEntity<String> deleteUser(@NoAuth TokenResponse tokenResponse) {
-//        loginService.delete(tokenResponse.getAccessToken());
-//        return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
-//    }
+    @PutMapping("/mypage")
+    public UserResponseDto viewMyPage(@ApiIgnore HttpServletRequest request) {
+        return loginService.viewMyPage(request);
+    }
+
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userDto", value = "업데이트 값", required = true,
+                    dataType = "Object", paramType = "query")
+    })
+    @PutMapping("/mypage/update")
+    public ResponseEntity<String> updateMyPage(@RequestBody UserMyPageRequestDto userDto,
+                                               @ApiIgnore HttpServletRequest request) {
+        loginService.updateMyPage(userDto, request);
+        return ResponseEntity.ok("회원정보가 수정되었습니다.");
+    }
+
+
+    @DeleteMapping("/mypage/delete")
+    public ResponseEntity<String> deleteUser(@ApiIgnore HttpServletRequest request) {
+        loginService.delete(request);
+        return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
+    }
 }
