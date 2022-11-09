@@ -11,6 +11,7 @@ import com.homework.session.entity.BoardList;
 import com.homework.session.entity.File;
 import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
+import com.homework.session.jwt.JwtTokenProvider;
 import com.homework.session.service.S3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -39,6 +41,7 @@ public class BoardService {
     private final UserRepository userRepository;
     private final S3UploadService s3UploadService;
     private final FileRepository fileRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public Page<BoardList> getTitleBoardList(String keyword, Pageable pageable) {
@@ -67,9 +70,14 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse createBoard(BoardRequestDto boardListDto, String nickname) {
+    public UploadFileResponse createBoard(BoardRequestDto boardListDto, HttpServletRequest request) {
 
-        User user = userRepository.findByNickname(nickname);
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        String email = jwtTokenProvider.getUserEmail(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
         boardListDto.setUser(user);
 
         BoardList boardList = boardListDto.toEntity();
@@ -105,12 +113,18 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, String nickname) {
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        String email = jwtTokenProvider.getUserEmail(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         BoardList boardList = boardRepository.findById(boardListDto.getId()).orElseThrow(() ->
             { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        if (!boardList.getUser().getNickname().equals(nickname)) {
+        if (!boardList.getUser().getNickname().equals(user.getNickname())) {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
         }
 
@@ -149,11 +163,18 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteBoard(Long id, String nickname) {
+    public void deleteBoard(Long id, HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        String email = jwtTokenProvider.getUserEmail(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
         BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
             { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        if (!boardList.getUser().getNickname().equals(nickname)) {
+        if (!boardList.getUser().getNickname().equals(user.getNickname())) {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
         }
 
