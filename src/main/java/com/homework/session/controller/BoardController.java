@@ -38,8 +38,8 @@ public class BoardController {
     private final S3DownloadService s3DownloadService;
 
     @GetMapping("/main")
-    public Page<BoardList> getAllBoardList(@ApiIgnore @PageableDefault Pageable pageable) {
-        return boardService.getAllBoardList(pageable);
+    public List<BoardResponseDto> getAllBoardList() {
+        return boardService.getAllBoardList();
     }
 
     @GetMapping("/list/{id}")

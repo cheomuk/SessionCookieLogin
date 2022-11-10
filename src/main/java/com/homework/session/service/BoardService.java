@@ -7,9 +7,7 @@ import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.dto.BoardDto.BoardResponseDto;
 import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
 import com.homework.session.dto.BoardDto.UploadFileResponse;
-import com.homework.session.dto.CommentDto.CommentResponseDto;
 import com.homework.session.entity.BoardList;
-import com.homework.session.entity.Comment;
 import com.homework.session.entity.File;
 import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
@@ -17,9 +15,6 @@ import com.homework.session.jwt.JwtTokenProvider;
 import com.homework.session.service.S3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -69,11 +64,12 @@ public class BoardService {
     }
 
     @Transactional
-    public Page<BoardList> getAllBoardList(Pageable pageable) {
-        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);
-        pageable = PageRequest.of(page, 10);
+    public List<BoardResponseDto> getAllBoardList() {
+//        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);
+//        pageable = PageRequest.of(page, 10);
 
-        return boardRepository.findAll(pageable);
+        List<BoardList> boardLists = boardRepository.findAll();
+        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
