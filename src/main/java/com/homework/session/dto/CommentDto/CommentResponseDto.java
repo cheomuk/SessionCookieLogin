@@ -6,6 +6,8 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class CommentResponseDto {
@@ -17,16 +19,19 @@ public class CommentResponseDto {
     private String comment;
 
     @ApiModelProperty(value="생성 시간", example = "yyyy.MM.dd HH:mm", hidden = true)
-    private String createdDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+    private String createdDate;
 
     @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd HH:mm", hidden = true)
-    private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+    private String modifiedDate;
 
     @ApiModelProperty(value="닉네임", example = "홍길동", required = true)
     private String nickname;
 
     @ApiModelProperty(value="게시글 번호", example = "1", hidden = true)
     private Long boardListId;
+
+    @ApiModelProperty(value="부모 댓글 Id", example = "1", hidden = true)
+    private List<Comment> parent;
 
     /* Entity -> Dto*/
     public CommentResponseDto(Comment comment) {

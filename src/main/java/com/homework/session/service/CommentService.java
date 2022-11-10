@@ -30,7 +30,7 @@ public class CommentService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public Long createComment(Long id, CommentRequestDto commentDto, HttpServletRequest request) {
+    public String createParentComment(Long id, CommentRequestDto commentDto, HttpServletRequest request) {
 
         String token = jwtTokenProvider.resolveAccessToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
@@ -41,19 +41,42 @@ public class CommentService {
         BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        commentDto.setUser(user);
-        commentDto.setBoardList(boardList);
-
-        Comment comment = commentDto.toEntity();
+        Comment comment = Comment.parent(user, boardList, commentDto.getComment(), commentDto);
         commentRepository.save(comment);
 
-        return comment.getId();
+        return "부모 댓글 저장 완료";
+    }
+
+    @Transactional
+    public String createChildComment(CommentRequestDto commentDto, HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveAccessToken(request);
+        String email = jwtTokenProvider.getUserEmail(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
+        Comment child = validateComment(commentDto.getParentId(), user.getId(), commentDto);
+        commentRepository.save(child);
+
+        return "자식 댓글 저장 완료";
+    }
+
+    private Comment validateComment(final Long commentId, final Long userId, final CommentRequestDto commentRequestDto) {
+        Comment parent = commentRepository.getById(commentId);
+        if (!parent.isParent()) {
+            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+        }
+
+        return Comment.child(userRepository.getById(userId), parent.getBoardList(), commentRequestDto.getComment(),
+                commentRequestDto, parent);
     }
 
     @Transactional
     public List<CommentResponseDto> readComment(Long id) {
         BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
-                new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION));
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
         List<Comment> comments = boardList.getComments();
         return comments.stream().map(CommentResponseDto::new).collect(Collectors.toList());
     }

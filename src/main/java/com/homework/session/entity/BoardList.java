@@ -45,7 +45,7 @@ public class BoardList extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
     @OrderBy("id asc") // 오름차순 정렬
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
     private List<File> fileList = new ArrayList<>();

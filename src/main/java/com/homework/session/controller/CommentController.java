@@ -23,11 +23,16 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping("/list/{id}/comments")
-    public ResponseEntity createComment(@RequestBody CommentRequestDto commentRequestDto,
+    @PostMapping("/list/{id}/comments/parent")
+    public ResponseEntity<String> createParentComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto,
                                         @ApiIgnore HttpServletRequest request) {
-        return ResponseEntity.ok(commentService.createComment(commentRequestDto.getId(),
-                commentRequestDto, request));
+        return ResponseEntity.ok(commentService.createParentComment(id, commentRequestDto, request));
+    }
+
+    @PostMapping("/list/{id}/comments/child")
+    public ResponseEntity<String> createChildComment(@RequestBody CommentRequestDto commentRequestDto,
+                                                @ApiIgnore HttpServletRequest request) {
+        return ResponseEntity.ok(commentService.createChildComment(commentRequestDto, request));
     }
 
     @GetMapping("/list/{id}/comments")
@@ -35,14 +40,14 @@ public class CommentController {
         return commentService.readComment(id);
     }
 
-    @PutMapping("/list/{id}/comments/{id}")
+    @PutMapping("/list/{id}/comments")
     public ResponseEntity updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto,
                                         HttpServletRequest request) {
         commentService.updateComment(id, commentRequestDto, request);
         return ResponseEntity.ok(id);
     }
 
-    @DeleteMapping("/list/{id}/comments/{id}")
+    @DeleteMapping("/list/{id}/comments")
     public ResponseEntity delete(@PathVariable Long id, HttpServletRequest request) {
         commentService.deleteComment(id, request);
         return ResponseEntity.ok(id);
