@@ -1,10 +1,14 @@
 package com.homework.session.controller;
 
+import com.homework.session.service.TokenService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @Slf4j
@@ -13,4 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = {"토큰 검증 및 재발급 Controller"})
 public class TokenController {
 
+    private final TokenService tokenService;
+
+    public String validateToken(HttpServletRequest request, HttpServletResponse response) {
+        return tokenService.validateToken(request, response);
+    }
 }

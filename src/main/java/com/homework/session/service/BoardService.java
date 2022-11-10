@@ -7,7 +7,9 @@ import com.homework.session.dto.BoardDto.BoardRequestDto;
 import com.homework.session.dto.BoardDto.BoardResponseDto;
 import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
 import com.homework.session.dto.BoardDto.UploadFileResponse;
+import com.homework.session.dto.CommentDto.CommentResponseDto;
 import com.homework.session.entity.BoardList;
+import com.homework.session.entity.Comment;
 import com.homework.session.entity.File;
 import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
@@ -26,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -44,21 +47,25 @@ public class BoardService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public Page<BoardList> getTitleBoardList(String keyword, Pageable pageable) {
-        return boardRepository.findByTitle(keyword, pageable);
+    public List<BoardResponseDto> getTitleBoardList(String keyword) {
+        Optional<BoardList> boardLists = boardRepository.findByTitle(keyword);
+        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public Page<BoardList> getNicknameBoardList(String keyword, Pageable pageable) {
-        return boardRepository.findByNickname(keyword, pageable);
+    public List<BoardResponseDto> getNicknameBoardList(String keyword) {
+        Optional<BoardList> boardLists = boardRepository.findByNickname(keyword);
+        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public BoardResponseDto findBoardList(Long id) {
-        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+    public List<BoardResponseDto> findBoardList(Long id) {
+        if (boardRepository.getById(id).equals("")) {
+            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+        }
 
-        return new BoardResponseDto(boardList);
+        Optional<BoardList> boardLists = boardRepository.findById(id);
+        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional

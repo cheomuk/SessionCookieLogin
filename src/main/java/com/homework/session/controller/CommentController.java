@@ -1,8 +1,9 @@
 package com.homework.session.controller;
 
+import com.homework.session.dto.CommentDto.CommentDeleteRequestDto;
 import com.homework.session.dto.CommentDto.CommentRequestDto;
 import com.homework.session.dto.CommentDto.CommentResponseDto;
-import com.homework.session.dto.UserDto.UserResponseDto;
+import com.homework.session.dto.CommentDto.CommentUpdateRequestDto;
 import com.homework.session.service.CommentService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -41,15 +42,16 @@ public class CommentController {
     }
 
     @PutMapping("/list/{id}/comments")
-    public ResponseEntity updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto,
+    public ResponseEntity<String> updateComment(@RequestBody CommentUpdateRequestDto commentRequestDto,
                                         HttpServletRequest request) {
-        commentService.updateComment(id, commentRequestDto, request);
-        return ResponseEntity.ok(id);
+        commentService.updateComment(commentRequestDto, request);
+        return ResponseEntity.ok("댓글 업데이트 성공");
     }
 
     @DeleteMapping("/list/{id}/comments")
-    public ResponseEntity delete(@PathVariable Long id, HttpServletRequest request) {
-        commentService.deleteComment(id, request);
-        return ResponseEntity.ok(id);
+    public ResponseEntity<String> delete(@RequestBody CommentDeleteRequestDto requestDto,
+            HttpServletRequest request) {
+        commentService.deleteComment(requestDto, request);
+        return ResponseEntity.ok("댓글 삭제 완료");
     }
 }
