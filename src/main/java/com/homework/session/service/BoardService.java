@@ -15,9 +15,6 @@ import com.homework.session.jwt.JwtTokenProvider;
 import com.homework.session.service.S3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -26,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -44,29 +42,34 @@ public class BoardService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public Page<BoardList> getTitleBoardList(String keyword, Pageable pageable) {
-        return boardRepository.findByTitle(keyword, pageable);
+    public List<BoardResponseDto> getTitleBoardList(String keyword) {
+        Optional<BoardList> boardLists = boardRepository.findByTitle(keyword);
+        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public Page<BoardList> getNicknameBoardList(String keyword, Pageable pageable) {
-        return boardRepository.findByNickname(keyword, pageable);
+    public List<BoardResponseDto> getNicknameBoardList(String keyword) {
+        Optional<BoardList> boardLists = boardRepository.findByNickname(keyword);
+        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public BoardResponseDto findBoardList(Long id) {
-        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+    public List<BoardResponseDto> findBoardList(Long id) {
+        if (boardRepository.getById(id).equals("")) {
+            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+        }
 
-        return new BoardResponseDto(boardList);
+        Optional<BoardList> boardLists = boardRepository.findById(id);
+        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public Page<BoardList> getAllBoardList(Pageable pageable) {
-        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);
-        pageable = PageRequest.of(page, 10);
+    public List<BoardResponseDto> getAllBoardList() {
+//        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);
+//        pageable = PageRequest.of(page, 10);
 
-        return boardRepository.findAll(pageable);
+        List<BoardList> boardLists = boardRepository.findAll();
+        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional

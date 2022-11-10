@@ -1,10 +1,14 @@
 package com.homework.session.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.homework.session.dto.CommentDto.CommentRequestDto;
+import com.homework.session.dto.CommentDto.CommentUpdateRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -36,11 +40,13 @@ public class Comment {
     @LastModifiedDate
     private String modifiedDate;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent")
     private Comment parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -61,8 +67,9 @@ public class Comment {
         this.modifiedDate = requestDto.getModifiedDate();
     }
 
-    public void update(String comment) {
-        this.comment = comment;
+    public void update(CommentUpdateRequestDto requestDto) {
+        this.comment = requestDto.getComment();
+        this.modifiedDate = requestDto.getModifiedDate();
     }
 
     public static Comment parent(User user, BoardList boardList, String comment, CommentRequestDto requestDto) {

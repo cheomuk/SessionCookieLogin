@@ -3,8 +3,10 @@ package com.homework.session.service;
 import com.homework.session.Repository.BoardRepository;
 import com.homework.session.Repository.CommentRepository;
 import com.homework.session.Repository.UserRepository;
+import com.homework.session.dto.CommentDto.CommentDeleteRequestDto;
 import com.homework.session.dto.CommentDto.CommentRequestDto;
 import com.homework.session.dto.CommentDto.CommentResponseDto;
+import com.homework.session.dto.CommentDto.CommentUpdateRequestDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.entity.Comment;
 import com.homework.session.entity.User;
@@ -62,27 +64,27 @@ public class CommentService {
         return "자식 댓글 저장 완료";
     }
 
-    private Comment validateComment(final Long commentId, final Long userId, final CommentRequestDto commentRequestDto) {
-        Comment parent = commentRepository.getById(commentId);
+    private Comment validateComment(Long parentId, Long userId, CommentRequestDto commentRequestDto) {
+        Comment parent = commentRepository.getById(parentId);
         if (!parent.isParent()) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        return Comment.child(userRepository.getById(userId), parent.getBoardList(), commentRequestDto.getComment(),
+        User user = userRepository.findById(userId).orElseThrow();
+
+        return Comment.child(user, parent.getBoardList(), commentRequestDto.getComment(),
                 commentRequestDto, parent);
     }
 
     @Transactional
     public List<CommentResponseDto> readComment(Long id) {
-        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+        List<Comment> comments = commentRepository.findByBoardListIdAndParentIsNull(id);
 
-        List<Comment> comments = boardList.getComments();
         return comments.stream().map(CommentResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
+    public void updateComment(CommentUpdateRequestDto commentRequestDto, HttpServletRequest request) {
 
         String token = jwtTokenProvider.resolveAccessToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
@@ -90,18 +92,17 @@ public class CommentService {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        Comment comment = commentRepository.findById(id).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+        Comment comment = commentRepository.getById(commentRequestDto.getId());
 
         if (!comment.getUser().getNickname().equals(user.getNickname())) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        comment.update(commentRequestDto.getComment());
+        comment.update(commentRequestDto);
     }
 
     @Transactional
-    public void deleteComment(Long id, HttpServletRequest request) {
+    public void deleteComment(CommentDeleteRequestDto requestDto, HttpServletRequest request) {
 
         String token = jwtTokenProvider.resolveAccessToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
@@ -109,8 +110,7 @@ public class CommentService {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        Comment comment = commentRepository.findById(id).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+        Comment comment = commentRepository.getById(requestDto.getId());
 
         if (!comment.getUser().getNickname().equals(user.getNickname())) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);

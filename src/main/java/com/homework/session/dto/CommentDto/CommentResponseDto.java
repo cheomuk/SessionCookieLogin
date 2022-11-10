@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class CommentResponseDto {
@@ -30,8 +31,8 @@ public class CommentResponseDto {
     @ApiModelProperty(value="게시글 번호", example = "1", hidden = true)
     private Long boardListId;
 
-    @ApiModelProperty(value="부모 댓글 Id", example = "1", hidden = true)
-    private List<Comment> parent;
+    @ApiModelProperty(value="자식 댓글", example = "1", hidden = true)
+    private List<CommentResponseDto> children;
 
     /* Entity -> Dto*/
     public CommentResponseDto(Comment comment) {
@@ -41,5 +42,6 @@ public class CommentResponseDto {
         this.modifiedDate = comment.getModifiedDate();
         this.nickname = comment.getUser().getNickname();
         this.boardListId = comment.getBoardList().getId();
+        this.children = comment.getChildren().stream().map(CommentResponseDto::new).collect(Collectors.toList());
     }
 }

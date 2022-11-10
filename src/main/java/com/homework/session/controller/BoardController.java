@@ -1,6 +1,7 @@
 package com.homework.session.controller;
 
 import com.homework.session.dto.BoardDto.BoardRequestDto;
+import com.homework.session.dto.BoardDto.BoardResponseDto;
 import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
 import com.homework.session.dto.BoardDto.UploadFileResponse;
 import com.homework.session.dto.UserDto.UserRequestDto;
@@ -24,6 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -36,8 +38,13 @@ public class BoardController {
     private final S3DownloadService s3DownloadService;
 
     @GetMapping("/main")
-    public Page<BoardList> getAllBoardList(@ApiIgnore @PageableDefault Pageable pageable) {
-        return boardService.getAllBoardList(pageable);
+    public List<BoardResponseDto> getAllBoardList() {
+        return boardService.getAllBoardList();
+    }
+
+    @GetMapping("/list/{id}")
+    public List<BoardResponseDto> findBoardList(@PathVariable Long id) {
+        return boardService.findBoardList(id);
     }
 
     @ApiImplicitParams({
@@ -45,8 +52,8 @@ public class BoardController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/filter/title")
-    public Page<BoardList> getTitleBoardList(@RequestParam String keyword, @ApiIgnore @PageableDefault Pageable pageable) {
-        return boardService.getTitleBoardList(keyword, pageable);
+    public List<BoardResponseDto> getTitleBoardList(@RequestParam String keyword) {
+        return boardService.getTitleBoardList(keyword);
     }
 
     @ApiImplicitParams({
@@ -54,34 +61,25 @@ public class BoardController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/filter/nickname")
-    public Page<BoardList> getNicknameBoardList(@RequestParam String keyword, @ApiIgnore @PageableDefault Pageable pageable) {
-        return boardService.getNicknameBoardList(keyword, pageable);
+    public List<BoardResponseDto> getNicknameBoardList(@RequestParam String keyword) {
+        return boardService.getNicknameBoardList(keyword);
     }
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-                    dataType = "Object", paramType = "query")
-    })
+
     @PostMapping("/list/create")
     public UploadFileResponse createBoard(@RequestBody BoardRequestDto boardListDto,
                                           @ApiIgnore HttpServletRequest request) {
         return boardService.createBoard(boardListDto, request);
     }
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-                    dataType = "Object", paramType = "query")
-    })
+
     @PutMapping("/list/update")
     public UploadFileResponse updateBoard(@RequestBody BoardUpdateRequestDto boardListDto,
                                           @ApiIgnore HttpServletRequest request) {
         return boardService.updateBoard(boardListDto, request);
     }
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "loginUser", value = "로그인 세션값", required = true,
-                    dataType = "Object", paramType = "query")
-    })
+
     @DeleteMapping("/list/{id}")
     public ResponseEntity<String> deleteBoard(@PathVariable Long id, @ApiIgnore HttpServletRequest request) {
         boardService.deleteBoard(id, request);

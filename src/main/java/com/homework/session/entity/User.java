@@ -38,13 +38,13 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String introduction;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<String> roles = new ArrayList<>();
+
     public void update(UserRequestDto userDto) {
         this.nickname = userDto.getNickname();
         this.userRole = userDto.getUserRole();
         this.introduction = userDto.getIntroduction();
     }
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
-    private List<String> roles = new ArrayList<>();
 }
