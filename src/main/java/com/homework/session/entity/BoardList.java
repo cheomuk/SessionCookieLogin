@@ -48,7 +48,7 @@ public class BoardList extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
-    private List<File> fileList = new ArrayList<>();
+    private List<File> image = new ArrayList<>();
 
     public void update(BoardRequestDto boardListDto) {
         this.title = boardListDto.getTitle();

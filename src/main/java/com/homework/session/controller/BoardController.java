@@ -66,14 +66,9 @@ public class BoardController {
         return boardService.getNicknameBoardList(keyword);
     }
 
-    // @RequestPart(value="key", required=false) BoardRequestDto boardListDto,
-    // @RequestPart(value="image", required=true) MultipartFile file
-
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(@RequestPart(value="content") BoardRequestDto boardListDto,
-                                          @RequestPart(value="image") List<MultipartFile> files,
-                                          @ApiIgnore HttpServletRequest request) {
-        return boardService.createBoard(boardListDto, files, request);
+    public UploadFileResponse createBoard(BoardRequestDto boardListDto, @ApiIgnore HttpServletRequest request) {
+        return boardService.createBoard(boardListDto, request);
     }
 
 
