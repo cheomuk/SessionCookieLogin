@@ -41,6 +41,7 @@ public class BoardRequestDto {
         BoardList boardList = BoardList.builder()
                 .id(id)
                 .title(title)
+                .nickname(user.getNickname())
                 .questEnum(questEnum)
                 .context(context)
                 .user(user)

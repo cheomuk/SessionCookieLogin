@@ -1,6 +1,6 @@
 package com.homework.session.service;
 
-import com.homework.session.Repository.BoardRepository;
+import com.homework.session.Repository.BoardRepository.BoardRepository;
 import com.homework.session.Repository.CommentRepository;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.CommentDto.CommentDeleteRequestDto;

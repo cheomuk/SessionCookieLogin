@@ -74,7 +74,7 @@ public class BoardController {
 
 
     @PutMapping("/list/update")
-    public UploadFileResponse updateBoard(@RequestBody BoardUpdateRequestDto boardListDto,
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto,
                                           @ApiIgnore HttpServletRequest request) {
         return boardService.updateBoard(boardListDto, request);
     }
