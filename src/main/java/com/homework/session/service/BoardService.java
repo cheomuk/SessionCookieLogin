@@ -73,7 +73,8 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse createBoard(BoardRequestDto boardListDto, HttpServletRequest request) {
+    public UploadFileResponse createBoard(BoardRequestDto boardListDto,
+                                          List<MultipartFile> files, HttpServletRequest request) {
 
         String token = jwtTokenProvider.resolveAccessToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
@@ -85,6 +86,8 @@ public class BoardService {
 
         BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
+
+        boardListDto.setFileList(files);
 
         List<String> downloadLink = uploadBoardListFile(boardListDto, boardList);
         List<String> downloadUri = new ArrayList<>();

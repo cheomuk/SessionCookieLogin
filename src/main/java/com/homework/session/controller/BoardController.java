@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,11 +66,14 @@ public class BoardController {
         return boardService.getNicknameBoardList(keyword);
     }
 
+    // @RequestPart(value="key", required=false) BoardRequestDto boardListDto,
+    // @RequestPart(value="image", required=true) MultipartFile file
 
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(@RequestBody BoardRequestDto boardListDto,
+    public UploadFileResponse createBoard(@RequestPart(value="content") BoardRequestDto boardListDto,
+                                          @RequestPart(value="image") List<MultipartFile> files,
                                           @ApiIgnore HttpServletRequest request) {
-        return boardService.createBoard(boardListDto, request);
+        return boardService.createBoard(boardListDto, files, request);
     }
 
 
