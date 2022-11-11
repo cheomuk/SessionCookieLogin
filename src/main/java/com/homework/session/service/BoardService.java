@@ -100,7 +100,7 @@ public class BoardService {
     }
 
     private List<String> uploadBoardListFile(BoardRequestDto boardListDto, BoardList boardList) {
-        return boardListDto.getFileList().stream()
+        return boardListDto.getImage().stream()
                 .map(file -> s3UploadService.uploadFile(file))
                 .map(url -> createFile(boardList, url))
                 .map(file -> file.getFileUrl())
