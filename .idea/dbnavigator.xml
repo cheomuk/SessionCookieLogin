@@ -29,7 +29,7 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="befa3ef1-5004-488e-ba7c-aac5f5b38a56">
-      <console name="photoshopcommission" type="STANDARD" schema="photoshopcommission" session="Main"><![CDATA[truncate table users;]]></console>
+      <console name="photoshopcommission" type="STANDARD" schema="photoshopcommission" session="Main"><![CDATA[select * from users;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">

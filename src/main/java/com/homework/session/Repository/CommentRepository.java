@@ -1,5 +1,6 @@
 package com.homework.session.Repository;
 
+import com.homework.session.entity.BoardList;
 import com.homework.session.entity.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
