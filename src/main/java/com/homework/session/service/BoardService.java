@@ -80,6 +80,8 @@ public class BoardService {
     @Transactional
     public UploadFileResponse createBoard(BoardRequestDto boardListDto, HttpServletRequest request) {
 
+        System.out.println(boardListDto.getImage());
+
         String token = jwtTokenProvider.resolveAccessToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 

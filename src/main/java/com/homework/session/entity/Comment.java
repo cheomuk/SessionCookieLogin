@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -23,6 +24,7 @@ import java.util.Objects;
 @Getter
 @Table(name = "comments")
 @Entity
+@BatchSize(size = 10)
 public class Comment {
 
     @Id
