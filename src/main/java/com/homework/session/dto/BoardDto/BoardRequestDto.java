@@ -34,8 +34,8 @@ public class BoardRequestDto {
     @ApiModelProperty(value="사용자 정보", hidden = true)
     private User user;
 
-    @ApiModelProperty(value="사진 리스트", example = "[test1.png, test2.png]", required = true)
-    private List<MultipartFile> image = new ArrayList<>();
+//    @ApiModelProperty(value="사진 리스트", example = "[test1.png, test2.png]", required = true)
+//    private List<MultipartFile> image = new ArrayList<>();
 
     public BoardList toEntity() {
         BoardList boardList = BoardList.builder()

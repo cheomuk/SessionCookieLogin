@@ -78,9 +78,10 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse createBoard(BoardRequestDto boardListDto, HttpServletRequest request) {
+    public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
+                                          HttpServletRequest request) {
 
-        System.out.println(boardListDto.getImage());
+        System.out.println(image);
 
         String token = jwtTokenProvider.resolveAccessToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
@@ -93,7 +94,7 @@ public class BoardService {
         BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
 
-        List<String> downloadLink = uploadBoardListFile(boardListDto, boardList);
+        List<String> downloadLink = uploadBoardListFile(image, boardList);
         List<String> downloadUri = new ArrayList<>();
 
         for(String Link : downloadLink) {
@@ -106,8 +107,8 @@ public class BoardService {
         return uploadFileResponse;
     }
 
-    private List<String> uploadBoardListFile(BoardRequestDto boardListDto, BoardList boardList) {
-        return boardListDto.getImage().stream()
+    private List<String> uploadBoardListFile(List<MultipartFile> image, BoardList boardList) {
+        return image.stream()
                 .map(file -> s3UploadService.uploadFile(file))
                 .map(url -> createFile(boardList, url))
                 .map(file -> file.getFileUrl())

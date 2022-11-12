@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,9 +60,15 @@ public class BoardController {
         return boardService.getNicknameBoardList(keyword);
     }
 
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "image", value = "사진 저장용 배열", required = true,
+                    dataType = "List<MultipartFile>", paramType = "query")
+    })
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(BoardRequestDto boardListDto, @ApiIgnore HttpServletRequest request) {
-        return boardService.createBoard(boardListDto, request);
+    public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
+                                          @ApiIgnore HttpServletRequest request) {
+        return boardService.createBoard(image, boardListDto, request);
     }
 
 
