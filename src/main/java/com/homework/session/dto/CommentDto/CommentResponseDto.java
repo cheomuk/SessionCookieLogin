@@ -3,10 +3,6 @@ package com.homework.session.dto.CommentDto;
 import com.homework.session.entity.Comment;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

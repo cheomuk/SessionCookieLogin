@@ -3,7 +3,6 @@ package com.homework.session.dto.BoardDto;
 import com.homework.session.dto.CommentDto.CommentResponseDto;
 import com.homework.session.entity.BoardList;
 import com.homework.session.enumcustom.BoardEnumCustom;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 import java.util.List;
@@ -27,6 +26,7 @@ public class BoardResponseDto {
         this.questEnum = boardList.getQuestEnum();
         this.context = boardList.getContext();
         this.userId = boardList.getUser().getId();
-        this.comments = boardList.getComments().stream().map(CommentResponseDto::new).collect(Collectors.toList());
+        this.comments = boardList.getComments().stream().map(CommentResponseDto::new)
+                .filter(comments -> !comments.getChildren().isEmpty()).collect(Collectors.toList());
     }
 }
