@@ -1,9 +1,6 @@
 package com.homework.session.controller;
 
-import com.homework.session.dto.BoardDto.BoardRequestDto;
-import com.homework.session.dto.BoardDto.BoardResponseDto;
-import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
-import com.homework.session.dto.BoardDto.UploadFileResponse;
+import com.homework.session.dto.BoardDto.*;
 import com.homework.session.service.BoardService;
 import com.homework.session.service.S3.S3DownloadService;
 import io.swagger.annotations.Api;
@@ -33,7 +30,7 @@ public class BoardController {
     private final S3DownloadService s3DownloadService;
 
     @GetMapping("/main")
-    public List<BoardResponseDto> getAllBoardList() {
+    public List<ThumbnailResponseDto> getAllBoardList() {
         return boardService.getAllBoardList();
     }
 
@@ -47,7 +44,7 @@ public class BoardController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/filter/title")
-    public List<BoardResponseDto> getTitleBoardList(@RequestParam String keyword) {
+    public List<ThumbnailResponseDto> getTitleBoardList(@RequestParam String keyword) {
         return boardService.getTitleBoardList(keyword);
     }
 
@@ -56,7 +53,7 @@ public class BoardController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/filter/nickname")
-    public List<BoardResponseDto> getNicknameBoardList(@RequestParam String keyword) {
+    public List<ThumbnailResponseDto> getNicknameBoardList(@RequestParam String keyword) {
         return boardService.getNicknameBoardList(keyword);
     }
 
