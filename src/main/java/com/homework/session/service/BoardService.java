@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static com.homework.session.enumcustom.BoardEnumCustom.*;
 import static com.homework.session.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
 @RequiredArgsConstructor
@@ -61,18 +62,62 @@ public class BoardService {
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getAllBoardList() {
+    public List<ThumbnailResponseDto> getAllBeforeBoardList() {
 
         List<BoardList> boardLists = boardRepository.findAll();
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(BEFORE))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<ThumbnailResponseDto> getAllRequestingBoardList() {
+
+        List<BoardList> boardLists = boardRepository.findAll();
+
+        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(REQUESTING))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<ThumbnailResponseDto> getAllCompleteBoardList() {
+
+        List<BoardList> boardLists = boardRepository.findAll();
+
+        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(COMPLETE))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<ThumbnailResponseDto> getBeforeBoardList() {
+
+        List<BoardList> boardLists = boardRepository.findAll();
+
+        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(BEFORE))
+                .limit(8).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<ThumbnailResponseDto> getRequestingBoardList() {
+
+        List<BoardList> boardLists = boardRepository.findAll();
+
+        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(REQUESTING))
+                .limit(8).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<ThumbnailResponseDto> getCompleteBoardList() {
+
+        List<BoardList> boardLists = boardRepository.findAll();
+
+        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(COMPLETE))
+                .limit(8).collect(Collectors.toList());
     }
 
     @Transactional
     public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
                                           HttpServletRequest request) {
-
-        System.out.println(image);
 
         String token = jwtTokenProvider.resolveAccessToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
@@ -137,7 +182,7 @@ public class BoardService {
 
         List<String> downloadUri = new ArrayList<>();
 
-        for (MultipartFile Link : boardListDto.getFile()) {
+        for (MultipartFile Link : boardListDto.getImage()) {
             downloadUri.add(Link.getOriginalFilename());
         }
 
@@ -156,7 +201,7 @@ public class BoardService {
     }
 
     private void uploadFiles(BoardUpdateRequestDto boardListDto, BoardList boardList) {
-        boardListDto.getFile()
+        boardListDto.getImage()
                 .stream()
                 .forEach(file -> {
                     String url = s3UploadService.uploadFile(file);

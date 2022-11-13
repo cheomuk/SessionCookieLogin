@@ -51,7 +51,20 @@ create table files (
         primary key (id)
     ) engine=InnoDB;
     
-select * from files;]]></console>
+select * from files;
+
+select * from comments;
+
+create table comments (
+       id bigint not null AUTO_INCREMENT,
+        comment TEXT not null,
+        created_date varchar(255),
+        modified_date varchar(255),
+        board_list_id bigint,
+        parent bigint,
+        user_id bigint,
+        primary key (id)
+    ) engine=InnoDB;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
