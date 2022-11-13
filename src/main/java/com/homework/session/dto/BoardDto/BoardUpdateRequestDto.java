@@ -42,5 +42,5 @@ public class BoardUpdateRequestDto {
     private List<String> savedFileUrl = new ArrayList<>();
 
     @ApiModelProperty(value="사진 리스트", example = "[test1.png, test2.png]", required = true)
-    private List<MultipartFile> file = new ArrayList<>();
+    private List<MultipartFile> image = new ArrayList<>();
 }

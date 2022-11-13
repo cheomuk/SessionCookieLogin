@@ -29,9 +29,34 @@ public class BoardController {
     private final BoardService boardService;
     private final S3DownloadService s3DownloadService;
 
-    @GetMapping("/main")
-    public List<ThumbnailResponseDto> getAllBoardList() {
-        return boardService.getAllBoardList();
+    @GetMapping("/main/before/all")
+    public List<ThumbnailResponseDto> getAllBeforeBoardList() {
+        return boardService.getAllBeforeBoardList();
+    }
+
+    @GetMapping("/main/requesting/all")
+    public List<ThumbnailResponseDto> getAllRequestingBoardList() {
+        return boardService.getAllRequestingBoardList();
+    }
+
+    @GetMapping("/main/complete/all")
+    public List<ThumbnailResponseDto> getAllCompleteBoardList() {
+        return boardService.getAllCompleteBoardList();
+    }
+
+    @GetMapping("/main/before")
+    public List<ThumbnailResponseDto> getBeforeBoardList() {
+        return boardService.getBeforeBoardList();
+    }
+
+    @GetMapping("/main/requesting")
+    public List<ThumbnailResponseDto> getRequestingBoardList() {
+        return boardService.getRequestingBoardList();
+    }
+
+    @GetMapping("/main/complete")
+    public List<ThumbnailResponseDto> getCompleteBoardList() {
+        return boardService.getCompleteBoardList();
     }
 
     @GetMapping("/list/{id}")
