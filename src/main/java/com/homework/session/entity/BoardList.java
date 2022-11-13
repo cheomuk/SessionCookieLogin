@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 
@@ -22,7 +24,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Builder
 @Getter
 @BatchSize(size = 10)
-public class BoardList extends BaseTimeEntity {
+public class BoardList {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -41,6 +43,14 @@ public class BoardList extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String context;
 
+    @Column(name = "created_date")
+    @CreatedDate
+    private String createdDate;
+
+    @Column(name = "modified_date")
+    @LastModifiedDate
+    private String modifiedDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users")
     private User user;
@@ -52,13 +62,8 @@ public class BoardList extends BaseTimeEntity {
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
     private List<File> image = new ArrayList<>();
 
-    public void update(BoardRequestDto boardListDto) {
-        this.title = boardListDto.getTitle();
-        this.questEnum = boardListDto.getQuestEnum();
-        this.context = boardListDto.getContext();
-    }
-
-    public void updateBoardList(BoardUpdateRequestDto boardUpdateRequestDto) {
+    public void update(BoardUpdateRequestDto boardUpdateRequestDto) {
+        this.modifiedDate = boardUpdateRequestDto.getModifiedDate();
         this.title = boardUpdateRequestDto.getTitle();
         this.questEnum = boardUpdateRequestDto.getQuestEnum();
         this.context = boardUpdateRequestDto.getContext();

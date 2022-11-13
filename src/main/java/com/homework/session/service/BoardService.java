@@ -1,15 +1,10 @@
 package com.homework.session.service;
 
 import com.homework.session.Repository.BoardRepository.BoardRepository;
-import com.homework.session.Repository.CommentRepository;
 import com.homework.session.Repository.FileRepository.FileRepository;
 import com.homework.session.Repository.UserRepository;
-import com.homework.session.dto.BoardDto.BoardRequestDto;
-import com.homework.session.dto.BoardDto.BoardResponseDto;
-import com.homework.session.dto.BoardDto.BoardUpdateRequestDto;
-import com.homework.session.dto.BoardDto.UploadFileResponse;
+import com.homework.session.dto.BoardDto.*;
 import com.homework.session.entity.BoardList;
-import com.homework.session.entity.Comment;
 import com.homework.session.entity.File;
 import com.homework.session.entity.User;
 import com.homework.session.error.exception.UnAuthorizedException;
@@ -39,22 +34,20 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
-    private final CommentService commentService;
     private final S3UploadService s3UploadService;
     private final FileRepository fileRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public List<BoardResponseDto> getTitleBoardList(String keyword) {
+    public List<ThumbnailResponseDto> getTitleBoardList(String keyword) {
         Optional<BoardList> boardLists = boardRepository.findByTitle(keyword);
-        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
-    public List<BoardResponseDto> getNicknameBoardList(String keyword) {
+    public List<ThumbnailResponseDto> getNicknameBoardList(String keyword) {
         Optional<BoardList> boardLists = boardRepository.findByNickname(keyword);
-        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
@@ -68,13 +61,11 @@ public class BoardService {
     }
 
     @Transactional
-    public List<BoardResponseDto> getAllBoardList() {
-//        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);
-//        pageable = PageRequest.of(page, 10);
+    public List<ThumbnailResponseDto> getAllBoardList() {
 
         List<BoardList> boardLists = boardRepository.findAll();
 
-        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
@@ -142,7 +133,7 @@ public class BoardService {
         validateDeletedFiles(boardListDto);
         uploadFiles(boardListDto, boardList);
 
-        boardList.updateBoardList(boardListDto);
+        boardList.update(boardListDto);
 
         List<String> downloadUri = new ArrayList<>();
 
