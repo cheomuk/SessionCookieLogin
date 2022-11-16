@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,32 +31,32 @@ public class BoardController {
     private final S3DownloadService s3DownloadService;
 
     @GetMapping("/main/before/all")
-    public List<ThumbnailResponseDto> getAllBeforeBoardList() {
-        return boardService.getAllBeforeBoardList();
+    public Page<ThumbnailResponseDto> getAllBeforeBoardList(@RequestParam("page") int page) {
+        return boardService.getAllBeforeBoardList(page);
     }
 
     @GetMapping("/main/requesting/all")
-    public List<ThumbnailResponseDto> getAllRequestingBoardList() {
-        return boardService.getAllRequestingBoardList();
+    public Page<ThumbnailResponseDto> getAllRequestingBoardList(@RequestParam("page") int page) {
+        return boardService.getAllRequestingBoardList(page);
     }
 
     @GetMapping("/main/complete/all")
-    public List<ThumbnailResponseDto> getAllCompleteBoardList() {
-        return boardService.getAllCompleteBoardList();
+    public Page<ThumbnailResponseDto> getAllCompleteBoardList(@RequestParam("page") int page) {
+        return boardService.getAllCompleteBoardList(page);
     }
 
     @GetMapping("/main/before")
-    public List<ThumbnailResponseDto> getBeforeBoardList() {
+    public Page<ThumbnailResponseDto> getBeforeBoardList() {
         return boardService.getBeforeBoardList();
     }
 
     @GetMapping("/main/requesting")
-    public List<ThumbnailResponseDto> getRequestingBoardList() {
+    public Page<ThumbnailResponseDto> getRequestingBoardList() {
         return boardService.getRequestingBoardList();
     }
 
     @GetMapping("/main/complete")
-    public List<ThumbnailResponseDto> getCompleteBoardList() {
+    public Page<ThumbnailResponseDto> getCompleteBoardList() {
         return boardService.getCompleteBoardList();
     }
 
@@ -69,8 +70,8 @@ public class BoardController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/filter/title")
-    public List<ThumbnailResponseDto> getTitleBoardList(@RequestParam String keyword) {
-        return boardService.getTitleBoardList(keyword);
+    public Page<ThumbnailResponseDto> getTitleBoardList(@RequestParam String keyword, @RequestParam("page") int page) {
+        return boardService.getTitleBoardList(keyword, page);
     }
 
     @ApiImplicitParams({
@@ -78,8 +79,8 @@ public class BoardController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/filter/nickname")
-    public List<ThumbnailResponseDto> getNicknameBoardList(@RequestParam String keyword) {
-        return boardService.getNicknameBoardList(keyword);
+    public Page<ThumbnailResponseDto> getNicknameBoardList(@RequestParam String keyword, @RequestParam("page") int page) {
+        return boardService.getNicknameBoardList(keyword, page);
     }
 
 
