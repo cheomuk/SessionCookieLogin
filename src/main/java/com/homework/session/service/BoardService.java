@@ -1,6 +1,6 @@
 package com.homework.session.service;
 
-import com.homework.session.Repository.BoardRepository.BoardRepository;
+import com.homework.session.Repository.BoardRepository;
 import com.homework.session.Repository.FileRepository.FileRepository;
 import com.homework.session.Repository.UserRepository;
 import com.homework.session.dto.BoardDto.*;
@@ -12,6 +12,10 @@ import com.homework.session.jwt.JwtTokenProvider;
 import com.homework.session.service.S3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -40,15 +44,21 @@ public class BoardService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public List<ThumbnailResponseDto> getTitleBoardList(String keyword) {
-        Optional<BoardList> boardLists = boardRepository.findByTitle(keyword);
-        return boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList());
+    public Page<ThumbnailResponseDto> getTitleBoardList(String keyword, int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findByNickname(keyword, pageable);
+
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getNicknameBoardList(String keyword) {
-        Optional<BoardList> boardLists = boardRepository.findByNickname(keyword);
-        return boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList());
+    public Page<ThumbnailResponseDto> getNicknameBoardList(String keyword, int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findByNickname(keyword, pageable);
+
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
@@ -62,57 +72,57 @@ public class BoardService {
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getAllBeforeBoardList() {
+    public Page<ThumbnailResponseDto> getAllBeforeBoardList(int page) {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(BEFORE, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(BEFORE))
-                .collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getAllRequestingBoardList() {
+    public Page<ThumbnailResponseDto> getAllRequestingBoardList(int page) {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(REQUESTING, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(REQUESTING))
-                .collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getAllCompleteBoardList() {
+    public Page<ThumbnailResponseDto> getAllCompleteBoardList(int page) {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(COMPLETE, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(COMPLETE))
-                .collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getBeforeBoardList() {
+    public Page<ThumbnailResponseDto> getBeforeBoardList() {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(0, 8);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(BEFORE, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(BEFORE))
-                .limit(8).collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getRequestingBoardList() {
+    public Page<ThumbnailResponseDto> getRequestingBoardList() {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(0, 8);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(REQUESTING, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(REQUESTING))
-                .limit(8).collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getCompleteBoardList() {
+    public Page<ThumbnailResponseDto> getCompleteBoardList() {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(0, 8);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(COMPLETE, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(COMPLETE))
-                .limit(8).collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList()));
     }
 
     @Transactional

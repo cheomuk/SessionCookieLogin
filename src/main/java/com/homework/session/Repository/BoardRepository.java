@@ -1,6 +1,7 @@
-package com.homework.session.Repository.BoardRepository;
+package com.homework.session.Repository;
 
 import com.homework.session.entity.BoardList;
+import com.homework.session.enumcustom.BoardEnumCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -13,11 +14,8 @@ import java.util.Optional;
 
 @Repository
 public interface BoardRepository extends JpaRepository<BoardList, Long> {
-    Optional<BoardList> findByNickname(String nickname);
-    Optional<BoardList> findByTitle(String title);
+    Page<BoardList> findByNickname(String nickname, Pageable pageable);
+    Page<BoardList> findByTitle(String title, Pageable pageable);
     Optional<BoardList> findById(Long id);
-
-    @EntityGraph(attributePaths = {"comments", "comments.parent"}, type = EntityGraph.EntityGraphType.FETCH)
-    @Query("select distinct b from BoardList b")
-    List<BoardList> findAll();
+    Page<BoardList> findAllByQuestEnum(BoardEnumCustom questEnum, Pageable pageable);
 }
