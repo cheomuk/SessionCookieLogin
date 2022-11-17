@@ -136,6 +136,7 @@ public class BoardService {
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         boardListDto.setUser(user);
+        boardListDto.setQuestEnum(BEFORE);
 
         BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
