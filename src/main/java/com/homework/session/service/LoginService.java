@@ -118,13 +118,13 @@ public class LoginService {
 
     @Transactional
     public TokenResponse createToken(UserRequestDto userRequestDto, HttpServletResponse response) {
-
+        // test code
         if (userRepository.existsByNickname(userRequestDto.getNickname())) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
         User user = User.builder()
-                .email("evan26@gmail.com")
+                .email("evan27@gmail.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())
@@ -151,7 +151,7 @@ public class LoginService {
     @Transactional
     public String resolverToken(UserMyPageRequestDto requestDto,
                                 HttpServletRequest request, HttpServletResponse response) {
-
+        // test code
         String authorization = jwtTokenProvider.resolveAccessToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 

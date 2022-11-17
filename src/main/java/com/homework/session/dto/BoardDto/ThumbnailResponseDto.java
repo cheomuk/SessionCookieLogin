@@ -23,6 +23,6 @@ public class ThumbnailResponseDto {
         this.nickname = boardList.getNickname();
         this.title = boardList.getTitle();
         this.questEnum = boardList.getQuestEnum();
-        this.image = boardList.getImage().stream().map(FileResponseDto::new).collect(Collectors.toList());
+        this.image = boardList.getImage().stream().map(FileResponseDto::new).limit(1).collect(Collectors.toList());
     }
 }

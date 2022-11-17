@@ -33,7 +33,7 @@ public class BoardRequestDto {
     @ApiModelProperty(value="게시글 제목", example = "테스트 제목입니다.", required = true)
     private String title;
 
-    @ApiModelProperty(value="의뢰 상태", example = "BEFORE", required = true)
+    @ApiModelProperty(value="의뢰 상태", example = "BEFORE", hidden = true)
     private BoardEnumCustom questEnum;
 
     @ApiModelProperty(value="게시글 내용", example = "테스트 글입니다.", required = true)
