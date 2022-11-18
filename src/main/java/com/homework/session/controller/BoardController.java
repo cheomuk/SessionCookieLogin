@@ -61,7 +61,7 @@ public class BoardController {
     }
 
     @GetMapping("/list/{id}")
-    public List<BoardResponseDto> findBoardList(@PathVariable Long id) {
+    public BoardResponseDto findBoardList(@PathVariable Long id) {
         return boardService.findBoardList(id);
     }
 
@@ -73,6 +73,7 @@ public class BoardController {
     public Page<ThumbnailResponseDto> getTitleBoardList(@RequestParam String keyword, @RequestParam("page") int page) {
         return boardService.getTitleBoardList(keyword, page);
     }
+
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "keyword", value = "nickname 값", required = true,
