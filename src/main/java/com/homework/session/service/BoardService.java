@@ -62,13 +62,15 @@ public class BoardService {
     }
 
     @Transactional
-    public List<BoardResponseDto> findBoardList(Long id) {
+    public BoardResponseDto findBoardList(Long id) {
         if (boardRepository.getById(id).equals("")) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
         Optional<BoardList> boardLists = boardRepository.findById(id);
-        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
+        BoardResponseDto boardResponseDto = new BoardResponseDto(boardLists.orElseThrow());
+
+        return boardResponseDto;
     }
 
     @Transactional
