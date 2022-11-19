@@ -46,17 +46,17 @@ public class BoardController {
     }
 
     @GetMapping("/main/before")
-    public Page<ThumbnailResponseDto> getBeforeBoardList() {
+    public List<ThumbnailResponseDto> getBeforeBoardList() {
         return boardService.getBeforeBoardList();
     }
 
     @GetMapping("/main/requesting")
-    public Page<ThumbnailResponseDto> getRequestingBoardList() {
+    public List<ThumbnailResponseDto> getRequestingBoardList() {
         return boardService.getRequestingBoardList();
     }
 
     @GetMapping("/main/complete")
-    public Page<ThumbnailResponseDto> getCompleteBoardList() {
+    public List<ThumbnailResponseDto> getCompleteBoardList() {
         return boardService.getCompleteBoardList();
     }
 

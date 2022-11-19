@@ -101,30 +101,27 @@ public class BoardService {
     }
 
     @Transactional
-    public Page<ThumbnailResponseDto> getBeforeBoardList() {
+    public List<ThumbnailResponseDto> getBeforeBoardList() {
 
-        Pageable pageable = PageRequest.of(0, 8);
-        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(BEFORE, pageable);
+        List<BoardList> boardLists = boardRepository.findByQuestEnum(BEFORE);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList()));
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
     @Transactional
-    public Page<ThumbnailResponseDto> getRequestingBoardList() {
+    public List<ThumbnailResponseDto> getRequestingBoardList() {
 
-        Pageable pageable = PageRequest.of(0, 8);
-        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(REQUESTING, pageable);
+        List<BoardList> boardLists = boardRepository.findByQuestEnum(REQUESTING);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList()));
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
     @Transactional
-    public Page<ThumbnailResponseDto> getCompleteBoardList() {
+    public List<ThumbnailResponseDto> getCompleteBoardList() {
 
-        Pageable pageable = PageRequest.of(0, 8);
-        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(COMPLETE, pageable);
+        List<BoardList> boardLists = boardRepository.findByQuestEnum(COMPLETE);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList()));
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
     @Transactional
