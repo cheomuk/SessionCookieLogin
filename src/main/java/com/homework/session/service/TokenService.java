@@ -1,5 +1,9 @@
 package com.homework.session.service;
 
+import com.homework.session.Repository.BoardRepository;
+import com.homework.session.Repository.UserRepository;
+import com.homework.session.dto.JwtDto.CheckEnumRequest;
+import com.homework.session.enumcustom.UserRole;
 import com.homework.session.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
+import static com.homework.session.enumcustom.UserRole.GUEST;
+import static com.homework.session.enumcustom.UserRole.USER;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -18,6 +25,8 @@ import java.util.List;
 public class TokenService {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
 
     @Transactional
     public String validateToken(HttpServletRequest request, HttpServletResponse response) {
@@ -43,5 +52,47 @@ public class TokenService {
         }
 
         return "토큰 양호";
+    }
+
+    @Transactional
+    public boolean checkWriter(CheckEnumRequest requestDto, HttpServletRequest request) {
+        if (request.getHeader("authorization") == null) {
+            return false;
+        }
+
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+
+        if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
+            throw new JwtException("토큰 재발급 필요!!");
+        }
+
+        String email = jwtTokenProvider.getUserEmail(accessToken);
+        String nickname = boardRepository.getById(requestDto.getId()).getNickname();
+
+        if (userRepository.getByEmail(email).getNickname().equals(nickname)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Transactional
+    public UserRole checkEnum(HttpServletRequest request) {
+        if (request.getHeader("authorization") == null) {
+            return GUEST;
+        }
+
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+
+        if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
+            throw new JwtException("토큰 재발급 필요!!");
+        }
+
+        String email = jwtTokenProvider.getUserEmail(accessToken);
+        UserRole userEnum = userRepository.getByEmail(email).getUserRole();
+
+        return userEnum;
     }
 }
