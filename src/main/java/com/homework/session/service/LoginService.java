@@ -60,6 +60,7 @@ public class LoginService {
 
         redisService.setValues(refreshToken, user.getEmail());
         sessionCarrier.add("message", "회원가입 성공");
+        sessionCarrier.add("nickname", user.getNickname());
 
         return sessionCarrier;
     }
@@ -91,6 +92,7 @@ public class LoginService {
                 redisService.setValues(refreshToken, user.getEmail());
 
                 sessionCarrier.add("message", "로그인 성공");
+                sessionCarrier.add("nickname", user.getNickname());
             }
         } else {
             Random random = new Random();
