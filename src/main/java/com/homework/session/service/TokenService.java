@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 import static com.homework.session.enumcustom.UserRole.GUEST;
-import static com.homework.session.enumcustom.UserRole.USER;
 
 @RequiredArgsConstructor
 @Transactional
